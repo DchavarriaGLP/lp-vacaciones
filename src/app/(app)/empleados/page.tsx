@@ -21,12 +21,12 @@ export default async function EmpleadosPage() {
   // Fetch all employees with their company and project
   const { data: employees } = await supabase
     .from('employees')
-    .select(\`
+    .select(`
       id, employee_code, full_name, position, email, username,
       hire_date, dias_pendientes, status, role, jefe_directo,
       companies(id, name),
       projects(id, name)
-    \`)
+    `)
     .order('full_name', { ascending: true })
 
   // Fetch companies for filter

@@ -40,12 +40,12 @@ export default async function SolicitudesPage() {
 
   const { data: requests } = await supabase
     .from('vacation_requests')
-    .select(\`
+    .select(`
       id, start_date, end_date, business_days, status,
       submitted_at, short_notice, decision_notes,
       employees(full_name, position, companies(name), projects(name)),
       leave_types(name_es)
-    \`)
+    `)
     .order('submitted_at', { ascending: false })
     .limit(200)
 

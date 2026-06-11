@@ -22,7 +22,7 @@ export default async function AprobacionesPage() {
   // Get pending approval steps for this approver
   const { data: steps } = await supabase
     .from('approval_steps')
-    .select(\`
+    .select(`
       id, step_order, decision, created_at,
       request_id,
       vacation_requests!inner(
@@ -35,7 +35,7 @@ export default async function AprobacionesPage() {
         ),
         leave_types(name_es)
       )
-    \`)
+    `)
     .eq('approver_id', user.id)
     .eq('decision', 'pending')
     .eq('vacation_requests.status', 'pending')
@@ -46,12 +46,12 @@ export default async function AprobacionesPage() {
   if (role === 'admin') {
     const { data } = await supabase
       .from('vacation_requests')
-      .select(\`
+      .select(`
         id, start_date, end_date, business_days, status, submitted_at, short_notice, reason,
         employees(id, full_name, position, dias_pendientes, companies(name), projects(name)),
         leave_types(name_es),
         approval_steps(id, approver_id, decision, decided_at)
-      \`)
+      `)
       .in('status', ['pending', 'approved', 'rejected'])
       .order('submitted_at', { ascending: false })
       .limit(50)
