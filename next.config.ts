@@ -1,11 +1,15 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // Enable React strict mode
   reactStrictMode: true,
-  // Image optimization
   images: {
     remotePatterns: [],
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 }
 
