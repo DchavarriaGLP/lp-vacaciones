@@ -1,12 +1,12 @@
+"use server";
+
 import { getSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-"use server";
 
 // Server Actions del módulo de vacaciones.
 // Aplican: validación Zod + validación de negocio + Supabase + auditoría.
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import {
   vacationRequestInputSchema,
   approvalDecisionSchema,
@@ -139,7 +139,7 @@ export async function submitVacationRequest(formData: unknown) {
   await supabase.from("audit_logs").insert({
     company_id: employee.company_id,
     actor_id: session.id,
-    actor_email: user.email,
+    actor_email: session.username,
     action: "create",
     entity_type: "vacation_request",
     entity_id: request.id,
@@ -255,7 +255,7 @@ export async function decideApproval(formData: unknown) {
   await supabase.from("audit_logs").insert({
     company_id: before?.company_id,
     actor_id: session.id,
-    actor_email: user.email,
+    actor_email: session.username,
     action: decision === "approved" ? "approve" : "reject",
     entity_type: "vacation_request",
     entity_id: requestId,
