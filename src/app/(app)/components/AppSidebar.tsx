@@ -68,6 +68,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/empleados', label: 'Empleados', icon: <UsersIcon />, roles: ['admin'] },
   { href: '/riesgo-legal', label: 'Riesgo Legal', icon: <ShieldIcon />, roles: ['admin'] },
   { href: '/solicitudes', label: 'Todas las Solicitudes', icon: <ClipboardIcon />, roles: ['admin'] },
+  { href: '/admin/usuarios', label: 'Usuarios', icon: <UsersIcon />, roles: ['admin'] },
 ]
 
 interface Props {
