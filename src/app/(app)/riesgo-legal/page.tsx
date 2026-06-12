@@ -1,5 +1,6 @@
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,11 +24,11 @@ function formatDate(d: string | null) {
 }
 
 export default async function RiesgoLegalPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
-  const { data: appUser } = await supabase.from('app_users').select('role').eq('id', user.id).single()
+  const { data: appUser } = await supabase.from('app_users').select('role').eq('id', session.id).single()
   if (appUser?.role !== 'admin') redirect('/dashboard')
 
   // Employees with > 60 days balance (High risk: MITRADEL)

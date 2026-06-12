@@ -1,48 +1,23 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from 'next/server'
+import { getSessionFromRequest } from '@/lib/auth/session'
 
-// Middleware: refresca la sesión y redirige a /login si no autenticado.
-
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/api/health"];
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/api/health']
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const isPublic = PUBLIC_PATHS.some((p) => request.nextUrl.pathname.startsWith(p))
+  if (isPublic) return NextResponse.next()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const isPublic = PUBLIC_PATHS.some((p) => request.nextUrl.pathname.startsWith(p));
-
-  if (!user && !isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("redirect_to", request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+  const session = await getSessionFromRequest(request)
+  if (!session) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('redirect_to', request.nextUrl.pathname)
+    return NextResponse.redirect(url)
   }
 
-  return response;
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
-};
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+}

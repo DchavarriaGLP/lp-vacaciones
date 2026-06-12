@@ -1,22 +1,17 @@
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
 import { AprobacionesClient } from './AprobacionesClient'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AprobacionesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
-  const { data: appUser } = await supabase
-    .from('app_users')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  const role = appUser?.role ?? 'employee'
+  const role = session.role
   if (role === 'employee') redirect('/dashboard')
 
   // Get pending approval steps for this approver
@@ -36,7 +31,7 @@ export default async function AprobacionesPage() {
         leave_types(name_es)
       )
     `)
-    .eq('approver_id', user.id)
+    .eq('approver_id', session.id)
     .eq('decision', 'pending')
     .eq('vacation_requests.status', 'pending')
     .order('created_at', { ascending: false })
@@ -63,7 +58,7 @@ export default async function AprobacionesPage() {
       pendingSteps={steps ?? []}
       allRequests={allRequests}
       role={role}
-      userId={user.id}
+      userId={session.id}
     />
   )
 }

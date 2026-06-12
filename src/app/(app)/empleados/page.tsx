@@ -1,21 +1,16 @@
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { EmpleadosClient } from './EmpleadosClient'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EmpleadosPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
-  const { data: appUser } = await supabase
-    .from('app_users')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  const role = appUser?.role ?? 'employee'
+  const role = session.role
   if (role === 'employee') redirect('/dashboard')
 
   // Fetch all employees with their company and project

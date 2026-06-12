@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { formatDate } from '@/lib/utils'
 
 function StatCard({
@@ -54,25 +55,18 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
   // Get employee record
   const { data: employee } = await supabase
     .from('employees')
     .select('*, companies(name), projects(name)')
-    .eq('user_id', user.id)
+    .eq('user_id', session.id)
     .single()
 
-  // Get app_user role
-  const { data: appUser } = await supabase
-    .from('app_users')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  const role = appUser?.role ?? 'employee'
+  const role = session.role
 
   // Get current year balance
   const currentYear = new Date().getFullYear()
@@ -101,7 +95,7 @@ export default async function DashboardPage() {
     const { count } = await supabase
       .from('approval_steps')
       .select('*', { count: 'exact', head: true })
-      .eq('approver_id', user.id)
+      .eq('approver_id', session.id)
       .eq('decision', 'pending')
     pendingCount = count ?? 0
 

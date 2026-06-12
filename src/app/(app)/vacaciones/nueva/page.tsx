@@ -1,16 +1,17 @@
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { VacationRequestFormClient } from './VacationRequestFormClient'
 
 export default async function NuevaVacacionPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
   const { data: employee } = await supabase
     .from('employees')
     .select('id, full_name, dias_pendientes, hire_date, company_id')
-    .eq('user_id', user.id)
+    .eq('user_id', session.id)
     .single()
 
   if (!employee) {

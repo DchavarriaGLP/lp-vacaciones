@@ -1,3 +1,5 @@
+import { getSession } from "@/lib/auth/session";
+import { createAdminClient } from "@/lib/supabase/admin";
 "use server";
 
 // Server Actions del módulo de vacaciones.
@@ -17,9 +19,9 @@ import {
 } from "@/lib/domain/vacation-rules";
 
 export async function submitVacationRequest(formData: unknown) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "No autenticado" };
+  const session = await getSession();
+  if (!session) return { ok: false, error: "No autenticado" };
+  const supabase = createAdminClient();
 
   const parsed = vacationRequestInputSchema.safeParse(formData);
   if (!parsed.success) {
@@ -136,7 +138,7 @@ export async function submitVacationRequest(formData: unknown) {
   // Auditoría
   await supabase.from("audit_logs").insert({
     company_id: employee.company_id,
-    actor_id: user.id,
+    actor_id: session.id,
     actor_email: user.email,
     action: "create",
     entity_type: "vacation_request",
@@ -149,9 +151,9 @@ export async function submitVacationRequest(formData: unknown) {
 }
 
 export async function decideApproval(formData: unknown) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "No autenticado" };
+  const session = await getSession();
+  if (!session) return { ok: false, error: "No autenticado" };
+  const supabase = createAdminClient();
 
   const parsed = approvalDecisionSchema.safeParse(formData);
   if (!parsed.success) return { ok: false, error: parsed.error.flatten() };
@@ -193,7 +195,7 @@ export async function decideApproval(formData: unknown) {
       .update({
         status: newStatus,
         decided_at: new Date().toISOString(),
-        decided_by: user.id,
+        decided_by: session.id,
         decision_notes: notes,
       })
       .eq("id", requestId);
@@ -252,7 +254,7 @@ export async function decideApproval(formData: unknown) {
   // Auditoría
   await supabase.from("audit_logs").insert({
     company_id: before?.company_id,
-    actor_id: user.id,
+    actor_id: session.id,
     actor_email: user.email,
     action: decision === "approved" ? "approve" : "reject",
     entity_type: "vacation_request",

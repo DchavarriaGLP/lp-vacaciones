@@ -1,5 +1,6 @@
+import { getSession } from '@/lib/auth/session'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -9,15 +10,15 @@ function formatDate(d: string | null) {
 export const dynamic = 'force-dynamic'
 
 export default async function EquipoPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session) redirect('/login')
+  const supabase = createAdminClient()
 
-  const { data: appUser } = await supabase.from('app_users').select('role').eq('id', user.id).single()
+  const { data: appUser } = await supabase.from('app_users').select('role').eq('id', session.id).single()
   const role = appUser?.role ?? 'employee'
   if (role === 'employee') redirect('/dashboard')
 
-  const { data: employee } = await supabase.from('employees').select('id, full_name, company_id').eq('user_id', user.id).single()
+  const { data: employee } = await supabase.from('employees').select('id, full_name, company_id').eq('user_id', session.id).single()
 
   // Team members: employees who have this person as jefe_directo
   const { data: directReports } = employee
