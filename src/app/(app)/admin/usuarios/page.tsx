@@ -26,8 +26,8 @@ export default async function UsuariosPage() {
                                                       return (
                                                           <div>
                                                                 <div className="mb-6">
-                                                                        <h1 className="text-2xl font-bold text-white">Panel de Usuarios</h1>
-                                                                                <p className="text-gray-400 mt-1">
+                                                                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Panel de Usuarios</h1>
+                                                                                <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 mt-1">
                                                                                           {users?.length ?? 0} usuarios registrados
                                                                                                   </p>
                                                                                                         </div>

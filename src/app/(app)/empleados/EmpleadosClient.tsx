@@ -13,12 +13,12 @@ function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, string> = {
     admin:    'bg-purple-900/60 text-purple-300',
     manager:  'bg-blue-900/60 text-blue-300',
-    employee: 'bg-gray-800 text-gray-400',
+    employee: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400',
   }
   const labels: Record<string, string> = {
     admin: 'Admin', manager: 'Gerente', employee: 'Empleado',
   }
-  return <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium', styles[role] ?? 'bg-gray-800 text-gray-400')}>{labels[role] ?? role}</span>
+  return <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium', styles[role] ?? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400')}>{labels[role] ?? role}</span>
 }
 
 function StatusDot({ status }: { status: string }) {
@@ -92,13 +92,13 @@ function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps
   }
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 pt-16 overflow-y-auto">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
         <div className="flex items-start justify-between mb-5">
           <div>
-            <h3 className="text-lg font-bold text-white">{employee.full_name}</h3>
-            <p className="text-sm text-gray-400">{employee.position ?? '—'}</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{employee.full_name}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-600 dark:text-gray-400">{employee.position ?? '—'}</p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white">
+          <button onClick={onClose} className="text-gray-500 dark:text-gray-500 hover:text-white">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
@@ -116,52 +116,52 @@ function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-xs text-gray-500">Código</p>
-            <p className="text-white font-mono">{employee.employee_code}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Código</p>
+            <p className="text-gray-900 dark:text-white font-mono">{employee.employee_code}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Estado</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Estado</p>
             <div className="flex items-center">
               <StatusDot status={employee.status} />
-              <p className="text-white capitalize">{employee.status}</p>
+              <p className="text-gray-900 dark:text-white capitalize">{employee.status}</p>
             </div>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Empresa</p>
-            <p className="text-white">{employee.companies?.name ?? '—'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Empresa</p>
+            <p className="text-gray-900 dark:text-white">{employee.companies?.name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Proyecto</p>
-            <p className="text-white">{employee.projects?.name ?? '—'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Proyecto</p>
+            <p className="text-gray-900 dark:text-white">{employee.projects?.name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Email</p>
-            <p className="text-white text-xs break-all">{employee.email}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Email</p>
+            <p className="text-gray-900 dark:text-white text-xs break-all">{employee.email}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Usuario</p>
-            <p className="text-white">{employee.username}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Usuario</p>
+            <p className="text-gray-900 dark:text-white">{employee.username}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Fecha de ingreso</p>
-            <p className="text-white">{formatDate(employee.hire_date)}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Fecha de ingreso</p>
+            <p className="text-gray-900 dark:text-white">{formatDate(employee.hire_date)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Jefe directo</p>
-            <p className="text-white">{employee.jefe_directo || '—'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Jefe directo</p>
+            <p className="text-gray-900 dark:text-white">{employee.jefe_directo || '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Saldo vacaciones</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Saldo vacaciones</p>
             {editing ? (
               <div className="flex items-center gap-2 mt-1">
                 <input
                   type="number" step="0.1" min="0"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  className="w-24 bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-24 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button onClick={save} disabled={isPending} className="text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-2.5 py-1 rounded-lg">Guardar</button>
-                <button onClick={() => { setEditing(false); setValue(dias.toFixed(1)) }} className="text-xs text-gray-400 hover:text-white">Cancelar</button>
+                <button onClick={() => { setEditing(false); setValue(dias.toFixed(1)) }} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Cancelar</button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -176,13 +176,13 @@ function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps
             {msg && <p className={cn('text-xs mt-1', msg === 'Guardado' ? 'text-green-400' : 'text-red-400')}>{msg}</p>}
           </div>
           <div>
-            <p className="text-xs text-gray-500">Rol</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Rol</p>
             <RoleBadge role={employee.role} />
           </div>
         </div>
 
-        <div className="mt-5 pt-4 border-t border-gray-800">
-          <button onClick={onClose} className="w-full py-2.5 text-sm text-gray-400 border border-gray-700 rounded-lg hover:text-white transition-colors">
+        <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <button onClick={onClose} className="w-full py-2.5 text-sm text-gray-500 dark:text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700 rounded-lg hover:text-white transition-colors">
             Cerrar
           </button>
         </div>
@@ -241,8 +241,8 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Empleados</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Empleados</h1>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">
           {filteredActive.length} activos · {inactiveEmployees.length} inactivos
           {overLimit > 0 && (
             <span className="ml-2 text-red-400 font-medium">· {overLimit} con saldo &gt;60 días</span>
@@ -258,13 +258,13 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
             placeholder="Buscar por nombre, email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-600"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 dark:placeholder-gray-600"
           />
         </div>
         <select
           value={filterCompany}
           onChange={(e) => { setFilterCompany(e.target.value); setFilterProject('') }}
-          className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="">Todas las empresas</option>
           {companies.map((c) => (
@@ -274,7 +274,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
         <select
           value={filterProject}
           onChange={(e) => setFilterProject(e.target.value)}
-          className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="">Todos los proyectos</option>
           {filteredProjects.map((p) => (
@@ -284,25 +284,25 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
       </div>
 
       {/* Active employees table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">#</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Cargo</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Empresa</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Ingreso</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Saldo</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Rol</th>
+              <tr className="border-b border-gray-200 dark:border-gray-800">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">#</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Nombre</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Cargo</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empresa</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Ingreso</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Saldo</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Rol</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {filteredActive.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-gray-500 text-sm">
+                  <td colSpan={8} className="px-4 py-10 text-center text-gray-500 dark:text-gray-500 text-sm">
                     No se encontraron empleados con los filtros aplicados.
                   </td>
                 </tr>
@@ -319,17 +319,17 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
                       )}
                       onClick={() => setSelectedEmployee(emp)}
                     >
-                      <td className="px-4 py-3 font-mono text-gray-500 text-xs">{emp.employee_code}</td>
+                      <td className="px-4 py-3 font-mono text-gray-500 dark:text-gray-500 text-xs">{emp.employee_code}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <StatusDot status={emp.status} />
-                          <span className="text-white font-medium">{emp.full_name}</span>
+                          <span className="text-gray-900 dark:text-white font-medium">{emp.full_name}</span>
                         </div>
-                        <p className="text-xs text-gray-500 ml-3.5">{emp.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 ml-3.5">{emp.email}</p>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{emp.position ?? '—'}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{emp.companies?.name ?? '—'}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{emp.position ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{emp.companies?.name ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
                       <td className="px-4 py-3 text-right">
                         <span className={cn(
                           'font-bold font-mono',
@@ -358,7 +358,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
       <div>
         <button
           onClick={() => setShowInactive(!showInactive)}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           <svg className={cn('w-4 h-4 transition-transform', showInactive ? 'rotate-90' : '')} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -367,26 +367,26 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
         </button>
 
         {showInactive && (
-          <div className="mt-3 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+          <div className="mt-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-800">
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Cargo</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Empresa</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Saldo pendiente</th>
+                  <tr className="border-b border-gray-200 dark:border-gray-800">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Nombre</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Cargo</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empresa</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Saldo pendiente</th>
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                   {inactiveEmployees.map((emp) => (
                     <tr key={emp.id} className="hover:bg-gray-800/40 opacity-60 cursor-pointer" onClick={() => setSelectedEmployee(emp)}>
                       <td className="px-4 py-3 text-gray-300">{emp.full_name}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{emp.position ?? '—'}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{emp.companies?.name ?? '—'}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-400">{Number(emp.dias_pendientes).toFixed(1)}</td>
-                      <td className="px-4 py-3 text-xs text-gray-600">Inactivo</td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-500 text-xs">{emp.position ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-500 text-xs">{emp.companies?.name ?? '—'}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-500 dark:text-gray-600 dark:text-gray-400">{Number(emp.dias_pendientes).toFixed(1)}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-600">Inactivo</td>
                     </tr>
                   ))}
                 </tbody>

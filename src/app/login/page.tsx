@@ -33,7 +33,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 shadow-lg mb-4">
@@ -41,12 +41,12 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">LP Development</h1>
-          <p className="text-sm text-gray-400 mt-1">Sistema de Gestión de Vacaciones</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">LP Development</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-600 dark:text-gray-400 mt-1">Sistema de Gestión de Vacaciones</p>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl p-8">
-          <h2 className="text-lg font-semibold text-white mb-6">Iniciar sesión</h2>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-8">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Iniciar sesión</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="nombre.apellido"
-                className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500
+                className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
                            px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150"
               />
             </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500
+                className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
                            px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150"
               />
             </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-xs text-gray-600 text-center mt-6">
+          <p className="text-xs text-gray-500 dark:text-gray-600 text-center mt-6">
             ¿Problemas para ingresar? Contacta a Recursos Humanos.
           </p>
         </div>

@@ -22,12 +22,12 @@ function StatCard({
     blue:   'from-blue-900/40 border-blue-800/50 text-blue-400',
     indigo: 'from-indigo-900/40 border-indigo-800/50 text-indigo-400',
   }
-  const cls = accent ? colors[accent] : 'from-gray-800/40 border-gray-700/50 text-gray-300'
+  const cls = accent ? colors[accent] : 'from-gray-800/40 border-gray-300 dark:border-gray-700/50 text-gray-300'
   return (
     <div className={`bg-gradient-to-br ${cls} border rounded-2xl p-5`}>
-      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">{label}</p>
-      <p className={`text-3xl font-bold mt-1 ${accent ? '' : 'text-white'}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+      <p className="text-xs font-medium text-gray-500 dark:text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
+      <p className={`text-3xl font-bold mt-1 ${accent ? '' : 'text-gray-900 dark:text-white'}`}>{value}</p>
+      {sub && <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{sub}</p>}
     </div>
   )
 }
@@ -37,8 +37,8 @@ function StatusBadge({ status }: { status: string }) {
     pending:  'bg-yellow-900 text-yellow-300',
     approved: 'bg-green-900 text-green-300',
     rejected: 'bg-red-900 text-red-300',
-    draft:    'bg-gray-800 text-gray-400',
-    cancelled:'bg-gray-800 text-gray-400',
+    draft:    'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400',
+    cancelled:'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400',
   }
   const label: Record<string, string> = {
     pending:  'Pendiente',
@@ -48,7 +48,7 @@ function StatusBadge({ status }: { status: string }) {
     cancelled:'Cancelada',
   }
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${map[status] ?? 'bg-gray-800 text-gray-400'}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${map[status] ?? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400'}`}>
       {label[status] ?? status}
     </span>
   )
@@ -128,10 +128,10 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Bienvenido{employee ? `, ${employee.full_name.split(' ')[0]}` : ''}
         </h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">
           {(employee as { companies?: { name: string } } | null)?.companies?.name ?? ''}{' '}
           {(employee as { projects?: { name: string } } | null)?.projects?.name ? `· ${(employee as { projects?: { name: string } } | null)?.projects?.name}` : ''}
         </p>
@@ -186,16 +186,16 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mis solicitudes recientes */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-white">Mis solicitudes recientes</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Mis solicitudes recientes</h2>
             <Link href="/vacaciones" className="text-xs text-indigo-400 hover:text-indigo-300">
               Ver todas →
             </Link>
           </div>
           {!myRequests || myRequests.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-gray-500">Sin solicitudes aún</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Sin solicitudes aún</p>
               <Link href="/vacaciones/nueva" className="inline-block mt-3 text-xs text-indigo-400 hover:text-indigo-300">
                 + Crear solicitud
               </Link>
@@ -205,10 +205,10 @@ export default async function DashboardPage() {
               {myRequests.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {formatDate(req.start_date)} → {formatDate(req.end_date)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
                       {(req as { leave_types?: { name_es: string } | null }).leave_types?.name_es ?? 'Vacaciones'} · {req.business_days} días hábiles
                     </p>
                   </div>
@@ -220,19 +220,19 @@ export default async function DashboardPage() {
         </div>
 
         {/* Próximas vacaciones del equipo */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Próximas vacaciones del equipo</h2>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Próximas vacaciones del equipo</h2>
           {!upcoming || upcoming.length === 0 ? (
-            <p className="text-sm text-gray-500 py-8 text-center">Sin vacaciones programadas</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 py-8 text-center">Sin vacaciones programadas</p>
           ) : (
             <div className="space-y-3">
               {upcoming.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {(req as { employees?: { full_name: string } | null }).employees?.full_name ?? '—'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
                       {formatDate(req.start_date)} → {formatDate(req.end_date)} · {req.business_days}d
                     </p>
                   </div>
@@ -258,7 +258,7 @@ export default async function DashboardPage() {
         {(role === 'manager' || role === 'admin') && pendingCount > 0 && (
           <Link
             href="/aprobaciones"
-            className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-gray-900 dark:text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

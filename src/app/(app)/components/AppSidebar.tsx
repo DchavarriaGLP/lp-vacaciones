@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from './ThemeToggle'
 
 type UserRole = 'admin' | 'manager' | 'employee'
 
@@ -91,14 +92,14 @@ export function AppSidebar({ role, username }: Props) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-6 border-b border-gray-800">
+      <div className="px-5 py-6 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0">
             <CalendarIcon />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-tight">LP Development</p>
-            <p className="text-xs text-gray-500 leading-tight">Vacaciones</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">LP Development</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 leading-tight">Vacaciones</p>
           </div>
         </div>
       </div>
@@ -113,7 +114,7 @@ export function AppSidebar({ role, username }: Props) {
               onClick={() => setMobileOpen(false)}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                isActive ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                isActive ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800'
               )}
             >
               {item.icon}
@@ -123,20 +124,21 @@ export function AppSidebar({ role, username }: Props) {
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t border-gray-800 space-y-1">
+      <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
         <div className="px-3 py-2">
-          <p className="text-sm text-white font-medium">{username}</p>
+          <p className="text-sm text-gray-900 dark:text-white font-medium">{username}</p>
           <span className={cn(
             'inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full',
-            role === 'admin' ? 'bg-purple-900 text-purple-300' :
-            role === 'manager' ? 'bg-blue-900 text-blue-300' : 'bg-gray-800 text-gray-400'
+            role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' :
+            role === 'manager' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
           )}>
             {role === 'admin' ? 'Administrador' : role === 'manager' ? 'Gerente' : 'Empleado'}
           </span>
         </div>
+        <ThemeToggle />
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
         >
           <LogoutIcon />
           Cerrar sesión
@@ -148,7 +150,7 @@ export function AppSidebar({ role, username }: Props) {
   return (
     <>
       <button
-        className="fixed top-4 left-4 z-50 md:hidden bg-gray-900 rounded-lg p-2 text-gray-400"
+        className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-gray-600 dark:text-gray-400"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         <MenuIcon />
@@ -157,12 +159,12 @@ export function AppSidebar({ role, username }: Props) {
         <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 transition-transform duration-200 md:hidden',
+        'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-200 md:hidden',
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         {sidebarContent}
       </aside>
-      <aside className="hidden md:flex md:flex-col w-64 bg-gray-900 border-r border-gray-800 shrink-0">
+      <aside className="hidden md:flex md:flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shrink-0">
         {sidebarContent}
       </aside>
     </>

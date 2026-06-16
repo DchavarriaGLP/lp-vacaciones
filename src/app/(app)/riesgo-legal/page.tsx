@@ -65,73 +65,73 @@ export default async function RiesgoLegalPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Riesgo Legal</h1>
-        <p className="text-gray-400 text-sm mt-1">Alertas de cumplimiento con el Código de Trabajo de Panamá</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Riesgo Legal</h1>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">Alertas de cumplimiento con el Código de Trabajo de Panamá</p>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-red-950/40 border border-red-800/50 rounded-2xl p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Alto Riesgo</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Alto Riesgo</p>
           <p className="text-3xl font-bold text-red-400">{highCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Empleados &gt;60 días (MITRADEL)</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Empleados &gt;60 días (MITRADEL)</p>
         </div>
         <div className="bg-yellow-950/40 border border-yellow-800/50 rounded-2xl p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Riesgo Medio</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Riesgo Medio</p>
           <p className="text-3xl font-bold text-yellow-400">{medCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Empleados 45-60 días</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Empleados 45-60 días</p>
         </div>
         <div className="bg-orange-950/40 border border-orange-800/50 rounded-2xl p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Aprobaciones Tardías</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Aprobaciones Tardías</p>
           <p className="text-3xl font-bold text-orange-400">{staleCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Pendientes &gt;10 días</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Pendientes &gt;10 días</p>
         </div>
       </div>
 
       {/* Legal framework reminder */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-        <h2 className="text-sm font-semibold text-white mb-3">Marco Legal — Código de Trabajo de Panamá</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-400">
-          <p><span className="text-white font-medium">Art. 51:</span> 30 días de vacaciones por cada 11 meses trabajados (tasa: 2.7272 días/mes).</p>
-          <p><span className="text-white font-medium">Art. 54:</span> El pago de vacaciones debe hacerse 3 días antes del inicio.</p>
-          <p><span className="text-white font-medium">Art. 55:</span> Las vacaciones son continuas; fraccionamiento solo por convención colectiva.</p>
-          <p><span className="text-white font-medium">Art. 56:</span> El empleado debe avisar con 60 días de anticipación.</p>
-          <p><span className="text-white font-medium">Art. 57:</span> Acumulación máxima de 2 períodos (60 días); exceso requiere autorización de MITRADEL.</p>
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Marco Legal — Código de Trabajo de Panamá</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-500 dark:text-gray-600 dark:text-gray-400">
+          <p><span className="text-gray-900 dark:text-white font-medium">Art. 51:</span> 30 días de vacaciones por cada 11 meses trabajados (tasa: 2.7272 días/mes).</p>
+          <p><span className="text-gray-900 dark:text-white font-medium">Art. 54:</span> El pago de vacaciones debe hacerse 3 días antes del inicio.</p>
+          <p><span className="text-gray-900 dark:text-white font-medium">Art. 55:</span> Las vacaciones son continuas; fraccionamiento solo por convención colectiva.</p>
+          <p><span className="text-gray-900 dark:text-white font-medium">Art. 56:</span> El empleado debe avisar con 60 días de anticipación.</p>
+          <p><span className="text-gray-900 dark:text-white font-medium">Art. 57:</span> Acumulación máxima de 2 períodos (60 días); exceso requiere autorización de MITRADEL.</p>
         </div>
       </div>
 
       {/* High risk table */}
       {highCount > 0 && (
-        <div className="bg-gray-900 border border-red-900/50 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-900 border border-red-900/50 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
             <RiskBadge level="high" />
-            <h2 className="text-sm font-semibold text-white">Empleados con saldo superior a 60 días</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Empleados con saldo superior a 60 días</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Empleado</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Empresa</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Ingreso</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Saldo</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Exceso</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empleado</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empresa</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Ingreso</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Saldo</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Exceso</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {highRisk?.map((emp) => {
                   const dias = Number(emp.dias_pendientes)
                   const excess = dias - 60
                   return (
                     <tr key={emp.id} className="hover:bg-red-950/20">
                       <td className="px-5 py-3.5">
-                        <p className="text-white font-medium">{emp.full_name}</p>
-                        <p className="text-xs text-gray-500">{emp.position ?? '—'}</p>
+                        <p className="text-gray-900 dark:text-white font-medium">{emp.full_name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">{emp.position ?? '—'}</p>
                       </td>
-                      <td className="px-5 py-3.5 text-gray-400 text-xs">
+                      <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">
                         {(emp as { companies?: { name: string } | null }).companies?.name ?? '—'}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
+                      <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
                       <td className="px-5 py-3.5 text-right font-bold font-mono text-red-400">{dias.toFixed(1)}</td>
                       <td className="px-5 py-3.5 text-right font-mono text-red-300 text-xs">+{excess.toFixed(1)}</td>
                     </tr>
@@ -145,28 +145,28 @@ export default async function RiesgoLegalPage() {
 
       {/* Medium risk */}
       {medCount > 0 && (
-        <div className="bg-gray-900 border border-yellow-900/50 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-900 border border-yellow-900/50 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
             <RiskBadge level="medium" />
-            <h2 className="text-sm font-semibold text-white">Empleados con saldo entre 45-60 días</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Empleados con saldo entre 45-60 días</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Empleado</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Empresa</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Saldo</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empleado</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empresa</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Saldo</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {mediumRisk?.map((emp) => (
                   <tr key={emp.id} className="hover:bg-yellow-950/20">
                     <td className="px-5 py-3.5">
-                      <p className="text-white">{emp.full_name}</p>
-                      <p className="text-xs text-gray-500">{emp.position ?? '—'}</p>
+                      <p className="text-gray-900 dark:text-white">{emp.full_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">{emp.position ?? '—'}</p>
                     </td>
-                    <td className="px-5 py-3.5 text-gray-400 text-xs">
+                    <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">
                       {(emp as { companies?: { name: string } | null }).companies?.name ?? '—'}
                     </td>
                     <td className="px-5 py-3.5 text-right font-bold font-mono text-yellow-400">
@@ -182,29 +182,29 @@ export default async function RiesgoLegalPage() {
 
       {/* Stale pending */}
       {staleCount > 0 && (
-        <div className="bg-gray-900 border border-orange-900/50 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-800">
-            <h2 className="text-sm font-semibold text-white">Solicitudes pendientes sin respuesta (&gt;10 días)</h2>
+        <div className="bg-white dark:bg-gray-900 border border-orange-900/50 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Solicitudes pendientes sin respuesta (&gt;10 días)</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Empleado</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Fecha solicitud</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Inicio solicitado</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Días</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empleado</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Fecha solicitud</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Inicio solicitado</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Días</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {stalePending?.map((req) => (
                   <tr key={req.id} className="hover:bg-orange-950/20">
-                    <td className="px-5 py-3.5 text-white">
+                    <td className="px-5 py-3.5 text-gray-900 dark:text-white">
                       {(req as { employees?: { full_name: string; companies?: { name: string } | null } | null }).employees?.full_name ?? '—'}
                     </td>
                     <td className="px-5 py-3.5 text-orange-400 text-xs">{req.submitted_at ? formatDate(req.submitted_at) : '—'}</td>
-                    <td className="px-5 py-3.5 text-gray-400 text-xs">{formatDate(req.start_date)}</td>
-                    <td className="px-5 py-3.5 text-right text-white">{req.business_days}</td>
+                    <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{formatDate(req.start_date)}</td>
+                    <td className="px-5 py-3.5 text-right text-gray-900 dark:text-white">{req.business_days}</td>
                   </tr>
                 ))}
               </tbody>
@@ -219,7 +219,7 @@ export default async function RiesgoLegalPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
           </svg>
           <p className="text-green-400 font-medium">Sin alertas de riesgo legal activas</p>
-          <p className="text-xs text-gray-500 mt-1">Todos los empleados están dentro de los límites permitidos por ley.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Todos los empleados están dentro de los límites permitidos por ley.</p>
         </div>
       )}
     </div>

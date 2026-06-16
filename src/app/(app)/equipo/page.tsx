@@ -54,8 +54,8 @@ export default async function EquipoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Mi Equipo</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mi Equipo</h1>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">
           {directReports?.length ?? 0} reporte{(directReports?.length ?? 0) !== 1 ? 's' : ''} directo{(directReports?.length ?? 0) !== 1 ? 's' : ''}
         </p>
       </div>
@@ -67,7 +67,7 @@ export default async function EquipoPage() {
           <div className="space-y-2">
             {onVacation.map((r) => (
               <div key={r.id} className="flex justify-between items-center">
-                <p className="text-sm text-white">{(r as { employees?: { full_name: string } | null }).employees?.full_name ?? '—'}</p>
+                <p className="text-sm text-gray-900 dark:text-white">{(r as { employees?: { full_name: string } | null }).employees?.full_name ?? '—'}</p>
                 <p className="text-xs text-blue-400">{formatDate(r.start_date)} → {formatDate(r.end_date)}</p>
               </div>
             ))}
@@ -76,34 +76,34 @@ export default async function EquipoPage() {
       )}
 
       {/* Direct reports */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-800">
-          <h2 className="text-sm font-semibold text-white">Reportes directos</h2>
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Reportes directos</h2>
         </div>
         {!directReports || directReports.length === 0 ? (
-          <p className="text-sm text-gray-500 p-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-500 p-8 text-center">
             No se encontraron reportes directos. El sistema vincula jefes a través del campo &ldquo;jefe_directo&rdquo;.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Cargo</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Ingreso</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Saldo</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Nombre</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Cargo</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Ingreso</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Saldo</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {directReports.map((emp) => (
                   <tr key={emp.id} className="hover:bg-gray-800/40">
                     <td className="px-5 py-3.5">
-                      <p className="text-white font-medium">{emp.full_name}</p>
-                      <p className="text-xs text-gray-500">{emp.email}</p>
+                      <p className="text-gray-900 dark:text-white font-medium">{emp.full_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">{emp.email}</p>
                     </td>
-                    <td className="px-5 py-3.5 text-gray-400 text-xs">{emp.position ?? '—'}</td>
-                    <td className="px-5 py-3.5 text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
+                    <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{emp.position ?? '—'}</td>
+                    <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
                     <td className="px-5 py-3.5 text-right">
                       <span className={Number(emp.dias_pendientes) > 60 ? 'text-red-400 font-bold' : Number(emp.dias_pendientes) > 30 ? 'text-yellow-400' : 'text-green-400'}>
                         {Number(emp.dias_pendientes).toFixed(1)}
@@ -119,15 +119,15 @@ export default async function EquipoPage() {
 
       {/* Upcoming vacations */}
       {upcoming && upcoming.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Próximas vacaciones (30 días)</h2>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Próximas vacaciones (30 días)</h2>
           <div className="space-y-3">
             {upcoming.map((r) => (
               <div key={r.id} className="flex justify-between items-center">
-                <p className="text-sm text-white">{(r as { employees?: { full_name: string } | null }).employees?.full_name ?? '—'}</p>
+                <p className="text-sm text-gray-900 dark:text-white">{(r as { employees?: { full_name: string } | null }).employees?.full_name ?? '—'}</p>
                 <div className="text-right">
-                  <p className="text-xs text-gray-400">{formatDate(r.start_date)} → {formatDate(r.end_date)}</p>
-                  <p className="text-xs text-gray-600">{r.business_days} días hábiles</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-600 dark:text-gray-400">{formatDate(r.start_date)} → {formatDate(r.end_date)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-600">{r.business_days} días hábiles</p>
                 </div>
               </div>
             ))}

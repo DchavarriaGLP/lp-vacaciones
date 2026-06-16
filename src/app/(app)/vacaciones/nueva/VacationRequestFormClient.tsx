@@ -174,8 +174,8 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Solicitud enviada</h2>
-        <p className="text-gray-400">Tu solicitud de vacaciones fue enviada para aprobación.</p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Solicitud enviada</h2>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400">Tu solicitud de vacaciones fue enviada para aprobación.</p>
         {warnings.length > 0 && (
           <div className="mt-4 text-left">
             {warnings.map((w, i) => (
@@ -191,14 +191,14 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Nueva solicitud de vacaciones</h1>
-        <p className="text-gray-400 text-sm mt-1">{employee.full_name}</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Nueva solicitud de vacaciones</h1>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">{employee.full_name}</p>
       </div>
 
       {/* Balance info */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex gap-6">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex gap-6">
         <div>
-          <p className="text-xs text-gray-500">Saldo disponible</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500">Saldo disponible</p>
           <p className={cn(
             'text-2xl font-bold',
             balance.available_days > 60 ? 'text-red-400' :
@@ -206,24 +206,24 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
           )}>
             {balance.available_days.toFixed(1)}
           </p>
-          <p className="text-xs text-gray-600">días</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600">días</p>
         </div>
         {startDate && endDate && requestedDays > 0 && (
           <div>
-            <p className="text-xs text-gray-500">Días solicitados</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Días solicitados</p>
             <p className={cn('text-2xl font-bold', remainingAfter < 0 ? 'text-red-400' : 'text-blue-400')}>
               {requestedDays}
             </p>
-            <p className="text-xs text-gray-600">días hábiles</p>
+            <p className="text-xs text-gray-500 dark:text-gray-600">días hábiles</p>
           </div>
         )}
         {startDate && endDate && requestedDays > 0 && (
           <div>
-            <p className="text-xs text-gray-500">Quedarían</p>
-            <p className={cn('text-2xl font-bold', remainingAfter < 0 ? 'text-red-400' : 'text-white')}>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Quedarían</p>
+            <p className={cn('text-2xl font-bold', remainingAfter < 0 ? 'text-red-400' : 'text-gray-900 dark:text-white')}>
               {remainingAfter.toFixed(1)}
             </p>
-            <p className="text-xs text-gray-600">días</p>
+            <p className="text-xs text-gray-500 dark:text-gray-600">días</p>
           </div>
         )}
       </div>
@@ -252,7 +252,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 space-y-5">
 
         {/* Leave type */}
         <div>
@@ -261,7 +261,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
           </label>
           <select
             {...register('leaveTypeId')}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">Selecciona un tipo...</option>
             {leaveTypes.map((lt) => (
@@ -292,7 +292,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
               type="date"
               {...register('startDate')}
               min={new Date().toISOString().slice(0, 10)}
-              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             {errors.startDate && (
               <p className="text-xs text-red-400 mt-1">{errors.startDate.message}</p>
@@ -306,7 +306,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
               type="date"
               {...register('endDate')}
               min={startDate || new Date().toISOString().slice(0, 10)}
-              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             {errors.endDate && (
               <p className="text-xs text-red-400 mt-1">{errors.endDate.message}</p>
@@ -316,8 +316,8 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
 
         {/* Days summary */}
         {startDate && endDate && requestedDays > 0 && (
-          <div className="bg-gray-800/50 rounded-lg px-4 py-3 text-sm text-gray-300 space-y-1">
-            <p>Días hábiles solicitados: <strong className="text-white">{requestedDays}</strong></p>
+          <div className="bg-gray-100/70 dark:bg-gray-800/50 rounded-lg px-4 py-3 text-sm text-gray-300 space-y-1">
+            <p>Días hábiles solicitados: <strong className="text-gray-900 dark:text-white">{requestedDays}</strong></p>
             {pDate && (
               <p>Fecha de pago anticipado (Art. 54): <strong className="text-indigo-300">{pDate}</strong></p>
             )}
@@ -330,13 +330,13 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
         {/* Reason */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1.5">
-            Motivo <span className="text-gray-500">(opcional)</span>
+            Motivo <span className="text-gray-500 dark:text-gray-500">(opcional)</span>
           </label>
           <textarea
             {...register('reason')}
             rows={3}
             placeholder="Describe brevemente el motivo de tu solicitud..."
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-gray-600"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-gray-400 dark:placeholder-gray-600"
           />
           {errors.reason && (
             <p className="text-xs text-red-400 mt-1">{errors.reason.message}</p>
@@ -350,7 +350,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
               id="shortNoticeAck"
               type="checkbox"
               {...register('shortNoticeAck')}
-              className="mt-0.5 h-4 w-4 rounded border-gray-700 bg-gray-800 text-indigo-600 focus:ring-indigo-500"
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-indigo-600 focus:ring-indigo-500"
             />
             <label htmlFor="shortNoticeAck" className="text-sm text-gray-300">
               Confirmo que existe <strong>acuerdo mutuo</strong> entre empleador y trabajador para este preaviso reducido (Art. 56 Código de Trabajo).
@@ -388,14 +388,14 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-5 py-2.5 text-sm text-gray-400 hover:text-white border border-gray-700 rounded-lg transition-colors"
+            className="px-5 py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-700 rounded-lg transition-colors"
           >
             Cancelar
           </button>
         </div>
       </form>
 
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-gray-500 dark:text-gray-600 text-center">
         Al enviar esta solicitud, reconoces que has leído la política de vacaciones de LP Development Corp y que cumple con la legislación laboral panameña.
       </p>
     </div>

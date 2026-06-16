@@ -17,7 +17,7 @@ export default async function NuevaVacacionPage() {
   if (!employee) {
     return (
       <div className="text-center py-16">
-        <p className="text-gray-400">No se encontró tu perfil de empleado. Contacta a RRHH.</p>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400">No se encontró tu perfil de empleado. Contacta a RRHH.</p>
       </div>
     )
   }

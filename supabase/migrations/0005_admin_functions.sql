@@ -44,7 +44,8 @@ begin
     return false;
   end if;
   insert into app_users (id, username, email, role, password_hash, password_changed)
-  values (gen_random_uuid(), lower(p_username), p_email, p_role::user_role,
-          crypt(p_password, gen_salt('bf')), false);
+  values (gen_random_uuid(), lower(p_username),
+          coalesce(nullif(p_email,''), lower(p_username) || '@lpdevelopment.com'),
+          p_role::user_role, crypt(p_password, gen_salt('bf')), false);
   return true;
 end; $$;

@@ -9,8 +9,8 @@ function StatusBadge({ status }: { status: string }) {
     pending:   'bg-yellow-900/60 text-yellow-300 border border-yellow-800',
     approved:  'bg-green-900/60 text-green-300 border border-green-800',
     rejected:  'bg-red-900/60 text-red-300 border border-red-800',
-    draft:     'bg-gray-800 text-gray-400 border border-gray-700',
-    cancelled: 'bg-gray-800 text-gray-400 border border-gray-700',
+    draft:     'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700',
+    cancelled: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700',
   }
   const labels: Record<string, string> = {
     pending:   'Pendiente',
@@ -20,7 +20,7 @@ function StatusBadge({ status }: { status: string }) {
     cancelled: 'Cancelada',
   }
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] ?? 'bg-gray-800 text-gray-400'}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] ?? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400'}`}>
       {labels[status] ?? status}
     </span>
   )
@@ -62,8 +62,8 @@ export default async function VacacionesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Mis Vacaciones</h1>
-          <p className="text-gray-400 text-sm mt-1">Historial de solicitudes</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mis Vacaciones</h1>
+          <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">Historial de solicitudes</p>
         </div>
         <Link
           href="/vacaciones/nueva"
@@ -78,33 +78,33 @@ export default async function VacacionesPage() {
 
       {/* Balance card */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Disponibles</p>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-1">Disponibles</p>
           <p className={`text-2xl font-bold ${Number(availDays) > 60 ? 'text-red-400' : Number(availDays) > 30 ? 'text-yellow-400' : 'text-green-400'}`}>
             {Number(availDays).toFixed(1)}
           </p>
-          <p className="text-xs text-gray-600">días</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600">días</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Usados</p>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-1">Usados</p>
           <p className="text-2xl font-bold text-blue-400">{Number(balance?.used_days ?? 0).toFixed(1)}</p>
-          <p className="text-xs text-gray-600">días</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600">días</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total acumulado</p>
-          <p className="text-2xl font-bold text-white">{Number(balance?.accrued_days ?? availDays).toFixed(1)}</p>
-          <p className="text-xs text-gray-600">días</p>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-1">Total acumulado</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{Number(balance?.accrued_days ?? availDays).toFixed(1)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-600">días</p>
         </div>
       </div>
 
       {/* Requests table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
         {!requests || requests.length === 0 ? (
           <div className="py-16 text-center">
             <svg className="w-12 h-12 text-gray-700 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
             </svg>
-            <p className="text-gray-500 text-sm">No tienes solicitudes de vacaciones</p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm">No tienes solicitudes de vacaciones</p>
             <Link href="/vacaciones/nueva" className="inline-block mt-3 text-indigo-400 hover:text-indigo-300 text-sm">
               Crear tu primera solicitud →
             </Link>
@@ -113,25 +113,25 @@ export default async function VacacionesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha inicio</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha fin</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Días</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Enviada</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Tipo</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Fecha inicio</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Fecha fin</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Días</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Enviada</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {requests.map((req) => (
                   <tr key={req.id} className="hover:bg-gray-800/50 transition-colors">
-                    <td className="px-5 py-3.5 text-white">
+                    <td className="px-5 py-3.5 text-gray-900 dark:text-white">
                       {(req as { leave_types?: { name_es: string } | null }).leave_types?.name_es ?? 'Vacaciones Anuales'}
                     </td>
                     <td className="px-5 py-3.5 text-gray-300">{formatDate(req.start_date)}</td>
                     <td className="px-5 py-3.5 text-gray-300">{formatDate(req.end_date)}</td>
-                    <td className="px-5 py-3.5 text-right font-mono text-white">{req.business_days}</td>
-                    <td className="px-5 py-3.5 text-gray-400 text-xs">{req.submitted_at ? formatDate(req.submitted_at) : '—'}</td>
+                    <td className="px-5 py-3.5 text-right font-mono text-gray-900 dark:text-white">{req.business_days}</td>
+                    <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{req.submitted_at ? formatDate(req.submitted_at) : '—'}</td>
                     <td className="px-5 py-3.5">
                       <div>
                         <StatusBadge status={req.status} />

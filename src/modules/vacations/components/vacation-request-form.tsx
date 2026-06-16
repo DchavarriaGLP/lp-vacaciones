@@ -144,7 +144,7 @@ export function VacationRequestForm({
         <button
           type="submit"
           disabled={submitting || businessDays > availableDays}
-          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-gray-900 dark:text-white disabled:opacity-50"
         >
           {submitting ? "Enviando..." : "Enviar solicitud"}
         </button>

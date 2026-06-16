@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'LP Development — Gestión de Vacaciones',
@@ -12,8 +13,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className="dark">
-      <body className="bg-gray-950 text-white antialiased">{children}</body>
+    <html lang="es" suppressHydrationWarning>
+      <body className="bg-white text-gray-900 dark:bg-gray-950 dark:text-white antialiased">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

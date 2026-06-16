@@ -23,14 +23,14 @@ function StatusBadge({ status }: { status: string }) {
     pending: 'bg-yellow-900/60 text-yellow-300',
     approved: 'bg-green-900/60 text-green-300',
     rejected: 'bg-red-900/60 text-red-300',
-    draft: 'bg-gray-800 text-gray-400',
-    cancelled: 'bg-gray-800 text-gray-400',
+    draft: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400',
+    cancelled: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400',
   }
   const labels: Record<string, string> = {
     pending: 'Pendiente', approved: 'Aprobada', rejected: 'Rechazada',
     draft: 'Borrador', cancelled: 'Cancelada',
   }
-  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] ?? 'bg-gray-800 text-gray-400'}`}>{labels[status] ?? status}</span>
+  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] ?? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-600 dark:text-gray-400'}`}>{labels[status] ?? status}</span>
 }
 
 function formatDate(d: string | null) {
@@ -70,8 +70,8 @@ export function SolicitudesClient({ initial }: { initial: Req[] }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Todas las Solicitudes</h1>
-        <p className="text-gray-400 text-sm mt-1">Vista completa · {requests.length} registros</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Todas las Solicitudes</h1>
+        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">Vista completa · {requests.length} registros</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -82,40 +82,40 @@ export function SolicitudesClient({ initial }: { initial: Req[] }) {
           { k: 'rejected', label: `Rechazadas (${counts.rejected})` },
         ].map((f) => (
           <button key={f.k} onClick={() => setFilter(f.k)}
-            className={`text-xs px-3 py-1.5 rounded-lg border ${filter === f.k ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-gray-700 text-gray-400 hover:text-white'}`}>
+            className={`text-xs px-3 py-1.5 rounded-lg border ${filter === f.k ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
             {f.label}
           </button>
         ))}
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Empleado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Empresa</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Tipo</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Fechas</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Días</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Estado</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+              <tr className="border-b border-gray-200 dark:border-gray-800">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empleado</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Empresa</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Tipo</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Fechas</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Días</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Estado</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-500">Sin solicitudes.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-500 dark:text-gray-500">Sin solicitudes.</td></tr>
               ) : (
                 filtered.map((req) => (
                   <tr key={req.id} className="hover:bg-gray-800/40">
                     <td className="px-4 py-3">
-                      <p className="text-white">{req.employee_name}</p>
-                      <p className="text-xs text-gray-500">{req.employee_position}</p>
+                      <p className="text-gray-900 dark:text-white">{req.employee_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">{req.employee_position}</p>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{req.company_name}</td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{req.company_name}</td>
                     <td className="px-4 py-3 text-gray-300 text-xs">{req.leave_type}{req.short_notice && <span className="ml-1 text-orange-400">⚡</span>}</td>
                     <td className="px-4 py-3 text-gray-300 text-xs">{formatDate(req.start_date)} → {formatDate(req.end_date)}</td>
-                    <td className="px-4 py-3 text-right font-mono text-white">{req.business_days}</td>
+                    <td className="px-4 py-3 text-right font-mono text-gray-900 dark:text-white">{req.business_days}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={req.status} />
                       {msg?.id === req.id && <span className={`ml-2 text-xs ${msg.ok ? 'text-green-400' : 'text-red-400'}`}>{msg.text}</span>}
@@ -128,7 +128,7 @@ export function SolicitudesClient({ initial }: { initial: Req[] }) {
                         <button onClick={() => changeStatus(req.id, 'rejected')} disabled={isPending} className="text-xs text-red-400 hover:text-red-300 disabled:opacity-40 mr-2">Rechazar</button>
                       )}
                       {req.status !== 'cancelled' && (
-                        <button onClick={() => changeStatus(req.id, 'cancelled')} disabled={isPending} className="text-xs text-gray-400 hover:text-white disabled:opacity-40">Cancelar</button>
+                        <button onClick={() => changeStatus(req.id, 'cancelled')} disabled={isPending} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-40">Cancelar</button>
                       )}
                     </td>
                   </tr>
