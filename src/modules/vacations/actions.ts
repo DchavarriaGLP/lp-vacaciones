@@ -57,7 +57,7 @@ export async function submitVacationRequest(formData: unknown) {
     shortNoticeAck: input.shortNoticeAck,
     policy: {
       id: policy.id,
-      companyId: policy.company_id,
+      companyId: policy.company_id ?? "",
       name: policy.name,
       isDefault: policy.is_default,
       accrualDaysPerMonth: Number(policy.accrual_days_per_month),

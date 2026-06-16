@@ -17,7 +17,21 @@ const COOKIE_NAME = 'lp_session'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 días
 
 function getSecret(): string {
-  return process.env.SESSION_SECRET ?? 'lp-dev-secret-change-in-prod-2024'
+  const secret = process.env.SESSION_SECRET
+  if (secret && secret.length >= 16) return secret
+  // En producción exigimos un secreto fuerte; nunca firmar con un default.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET no configurado (mínimo 16 caracteres) en producción')
+  }
+  return 'lp-dev-secret-change-in-prod-2024'
+}
+
+/** Comparación en tiempo constante para evitar timing attacks. */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
 }
 
 async function sign(payload: string, secret: string): Promise<string> {
@@ -32,7 +46,7 @@ async function sign(payload: string, secret: string): Promise<string> {
 
 async function verify(payload: string, signature: string, secret: string): Promise<boolean> {
   const expected = await sign(payload, secret)
-  return expected === signature
+  return timingSafeEqual(expected, signature)
 }
 
 export function encodeSession(user: SessionUser): Promise<string> {
@@ -43,7 +57,9 @@ export function encodeSession(user: SessionUser): Promise<string> {
 export async function decodeSession(token: string): Promise<SessionUser | null> {
   const parts = token.split('.')
   if (parts.length !== 2) return null
-  const [payload, sig] = parts
+  const payload = parts[0]
+  const sig = parts[1]
+  if (!payload || !sig) return null
   const valid = await verify(payload, sig, getSecret())
   if (!valid) return null
   try {
@@ -74,9 +90,11 @@ export async function createSessionCookie(user: SessionUser): Promise<string> {
 }
 
 export function buildSetCookieHeader(token: string): string {
-  return `${COOKIE_NAME}=${token}; HttpOnly; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : ''
+  return `${COOKIE_NAME}=${token}; HttpOnly; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`
 }
 
 export function buildClearCookieHeader(): string {
-  return `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : ''
+  return `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax${secure}`
 }

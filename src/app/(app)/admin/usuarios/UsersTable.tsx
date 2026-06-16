@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { resetUserPassword } from './actions'
+import { resetUserPassword, createUser } from './actions'
 
 type AppUser = {
 id: string
@@ -29,6 +29,25 @@ const [filterRole, setFilterRole] = useState<string>('all')
 const [filterPwd, setFilterPwd] = useState<string>('all')
 const [isPending, startTransition] = useTransition()
 const [message, setMessage] = useState<{ id: string; text: string; ok: boolean } | null>(null)
+const [showCreate, setShowCreate] = useState(false)
+const [newUsername, setNewUsername] = useState('')
+const [newEmail, setNewEmail] = useState('')
+const [newRole, setNewRole] = useState('employee')
+const [createMsg, setCreateMsg] = useState<{ text: string; ok: boolean } | null>(null)
+
+function handleCreate() {
+  setCreateMsg(null)
+  startTransition(async () => {
+    const res = await createUser({ username: newUsername, email: newEmail, role: newRole })
+    if (res.error) {
+      setCreateMsg({ text: res.error, ok: false })
+    } else {
+      setCreateMsg({ text: 'Usuario creado (contraseña: 12345)', ok: true })
+      setNewUsername(''); setNewEmail(''); setNewRole('employee')
+      if (typeof window !== 'undefined') setTimeout(() => window.location.reload(), 1200)
+    }
+  })
+}
 
 const filtered = users.filter((u) => {
 const matchSearch = u.username.toLowerCase().includes(search.toLowerCase())
@@ -79,6 +98,7 @@ return (
 <option value="changed">Contrasena actualizada</option>
 </select>
 <span className="text-sm text-gray-500 self-center">{filtered.length} resultados</span>
+<button onClick={() => setShowCreate(true)} className="ml-auto text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg">+ Nuevo usuario</button>
 </div>
 <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
 <div className="overflow-x-auto">
@@ -119,6 +139,40 @@ Resetear
 </table>
 </div>
 </div>
+
+{showCreate && (
+<div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 pt-24">
+<div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+<div className="flex items-center justify-between mb-4">
+<h3 className="text-lg font-bold text-white">Nuevo usuario</h3>
+<button onClick={() => { setShowCreate(false); setCreateMsg(null) }} className="text-gray-500 hover:text-white">✕</button>
+</div>
+<div className="space-y-3">
+<div>
+<label className="block text-xs text-gray-400 mb-1">Usuario (nombre.apellido)</label>
+<input value={newUsername} onChange={(e) => setNewUsername(e.target.value)} placeholder="nombre.apellido" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+</div>
+<div>
+<label className="block text-xs text-gray-400 mb-1">Email (opcional)</label>
+<input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="correo@empresa.com" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+</div>
+<div>
+<label className="block text-xs text-gray-400 mb-1">Rol</label>
+<select value={newRole} onChange={(e) => setNewRole(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+<option value="employee">Empleado</option>
+<option value="manager">Gerente</option>
+<option value="admin">Administrador</option>
+</select>
+</div>
+{createMsg && <p className={`text-xs ${createMsg.ok ? 'text-green-400' : 'text-red-400'}`}>{createMsg.text}</p>}
+<button onClick={handleCreate} disabled={isPending || !newUsername} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-lg">
+{isPending ? 'Creando...' : 'Crear usuario'}
+</button>
+<p className="text-xs text-gray-600 text-center">La contraseña inicial será 12345</p>
+</div>
+</div>
+</div>
+)}
 </div>
 )
 }

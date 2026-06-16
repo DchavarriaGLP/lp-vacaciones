@@ -40,6 +40,7 @@ export interface Database {
           ruc?: string | null
           legal_rep?: string | null
         }
+        Relationships: []
       }
       projects: {
         Row: {
@@ -65,31 +66,47 @@ export interface Database {
           full_label?: string | null
           active?: boolean
         }
+        Relationships: [
+          {
+            foreignKeyName: "projects_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       app_users: {
         Row: {
           id: string
-          email: string
-          username: string | null
+          email: string | null
+          username: string
           role: UserRole
+          password_hash: string | null
+          password_changed: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
-          id: string
-          email: string
-          username?: string | null
+          id?: string
+          email?: string | null
+          username: string
           role?: UserRole
+          password_hash?: string | null
+          password_changed?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          email?: string
-          username?: string | null
+          email?: string | null
+          username?: string
           role?: UserRole
+          password_hash?: string | null
+          password_changed?: boolean
           updated_at?: string
         }
+        Relationships: []
       }
       employees: {
         Row: {
@@ -172,6 +189,36 @@ export interface Database {
           role?: UserRole
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vacation_policies: {
         Row: {
@@ -221,6 +268,7 @@ export interface Database {
           payment_calc_basis?: PaymentCalcBasis
           approval_levels?: number
         }
+        Relationships: []
       }
       leave_types: {
         Row: {
@@ -261,6 +309,7 @@ export interface Database {
           legal_basis?: string | null
           active?: boolean
         }
+        Relationships: []
       }
       vacation_balances: {
         Row: {
@@ -298,6 +347,22 @@ export interface Database {
           accumulation_authorized_at?: string | null
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "vacation_balances_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacation_balances_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "vacation_policies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vacation_requests: {
         Row: {
@@ -368,6 +433,36 @@ export interface Database {
           decision_notes?: string | null
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "vacation_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacation_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacation_requests_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "vacation_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacation_requests_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       approval_steps: {
         Row: {
@@ -402,6 +497,29 @@ export interface Database {
           notes?: string | null
           decided_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "approval_steps_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_steps_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "vacation_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_steps_approver_id_fkey"
+            columns: ["approver_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audit_logs: {
         Row: {
@@ -441,6 +559,7 @@ export interface Database {
           before_state?: Json | null
           after_state?: Json | null
         }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -475,6 +594,15 @@ export interface Database {
           link_url?: string | null
           read_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payroll_events: {
         Row: {
@@ -512,6 +640,15 @@ export interface Database {
           calc_basis?: PaymentCalcBasis | null
           processed_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_events_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: Record<string, never>
@@ -534,6 +671,18 @@ export interface Database {
       }
       is_manager_or_admin: {
         Args: Record<string, never>
+        Returns: boolean
+      }
+      verify_password: {
+        Args: { p_hash: string; p_password: string }
+        Returns: boolean
+      }
+      admin_reset_password: {
+        Args: { p_user_id: string; p_new_password: string }
+        Returns: boolean
+      }
+      create_app_user: {
+        Args: { p_username: string; p_email: string | null; p_role: string; p_password: string }
         Returns: boolean
       }
     }

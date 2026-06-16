@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
+import { updateEmployeeDays } from './actions'
 import { cn } from '@/lib/utils'
 
 function formatDate(d: string | null) {
@@ -68,10 +69,27 @@ interface Props {
 interface ProfileModalProps {
   employee: Employee
   onClose: () => void
+  canEdit?: boolean
+  onSaved?: (id: string, dias: number) => void
 }
 
-function ProfileModal({ employee, onClose }: ProfileModalProps) {
+function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps) {
   const dias = Number(employee.dias_pendientes)
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(dias.toFixed(1))
+  const [isPending, startTransition] = useTransition()
+  const [msg, setMsg] = useState<string | null>(null)
+
+  function save() {
+    const num = parseFloat(value)
+    if (Number.isNaN(num) || num < 0) { setMsg('Valor inválido'); return }
+    startTransition(async () => {
+      const res = await updateEmployeeDays(employee.id, num)
+      if (res.error) { setMsg(res.error) }
+      else { setMsg('Guardado'); setEditing(false); onSaved?.(employee.id, num) }
+      setTimeout(() => setMsg(null), 2500)
+    })
+  }
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 pt-16 overflow-y-auto">
       <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
@@ -134,9 +152,28 @@ function ProfileModal({ employee, onClose }: ProfileModalProps) {
           </div>
           <div>
             <p className="text-xs text-gray-500">Saldo vacaciones</p>
-            <p className={cn('text-xl font-bold', dias > 60 ? 'text-red-400' : dias > 30 ? 'text-yellow-400' : 'text-green-400')}>
-              {dias.toFixed(1)} días
-            </p>
+            {editing ? (
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="number" step="0.1" min="0"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  className="w-24 bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button onClick={save} disabled={isPending} className="text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-2.5 py-1 rounded-lg">Guardar</button>
+                <button onClick={() => { setEditing(false); setValue(dias.toFixed(1)) }} className="text-xs text-gray-400 hover:text-white">Cancelar</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className={cn('text-xl font-bold', dias > 60 ? 'text-red-400' : dias > 30 ? 'text-yellow-400' : 'text-green-400')}>
+                  {dias.toFixed(1)} días
+                </p>
+                {canEdit && (
+                  <button onClick={() => setEditing(true)} className="text-xs text-indigo-400 hover:text-indigo-300">Editar</button>
+                )}
+              </div>
+            )}
+            {msg && <p className={cn('text-xs mt-1', msg === 'Guardado' ? 'text-green-400' : 'text-red-400')}>{msg}</p>}
           </div>
           <div>
             <p className="text-xs text-gray-500">Rol</p>
@@ -154,12 +191,19 @@ function ProfileModal({ employee, onClose }: ProfileModalProps) {
   )
 }
 
-export function EmpleadosClient({ employees, companies, projects }: Props) {
+export function EmpleadosClient({ employees: initialEmployees, companies, projects, currentUserRole }: Props) {
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees)
+  const isAdmin = currentUserRole === 'admin'
   const [search, setSearch] = useState('')
   const [filterCompany, setFilterCompany] = useState('')
   const [filterProject, setFilterProject] = useState('')
   const [showInactive, setShowInactive] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+
+  function handleSaved(id: string, dias: number) {
+    setEmployees((prev) => prev.map((e) => e.id === id ? { ...e, dias_pendientes: dias } : e))
+    setSelectedEmployee((prev) => prev && prev.id === id ? { ...prev, dias_pendientes: dias } : prev)
+  }
 
   const activeEmployees = useMemo(() =>
     employees.filter((e) => e.status === 'active' || e.status === 'on_vacation' || e.status === 'on_leave'),
@@ -353,7 +397,7 @@ export function EmpleadosClient({ employees, companies, projects }: Props) {
       </div>
 
       {selectedEmployee && (
-        <ProfileModal employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} />
+        <ProfileModal employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} canEdit={isAdmin} onSaved={handleSaved} />
       )}
     </div>
   )
