@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { submitVacationRequest } from '@/modules/vacations/actions'
+import { submitVacationRequest, uploadIncapacidad } from '@/modules/vacations/actions'
 import { cn } from '@/lib/utils'
 
 const formSchema = z.object({
@@ -96,6 +96,8 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
   const [serverErrors, setServerErrors] = useState<string[]>([])
   const [warnings, setWarnings] = useState<string[]>([])
   const [success, setSuccess] = useState(false)
+  const [incapacidadFile, setIncapacidadFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -121,6 +123,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
   const shortNotice = policy ? isShortNotice(startDate, policy.advance_notice_days) : false
   const remainingAfter = balance.available_days - requestedDays
   const selectedLeaveType = leaveTypes.find((lt) => lt.id === leaveTypeId)
+  const isSick = selectedLeaveType?.code === 'SICK'
   const pDate = policy && startDate ? paymentDate(startDate, policy.payment_lead_days) : ''
 
   const onSubmit = useCallback(
@@ -136,12 +139,39 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
         return
       }
 
+      const selectedType = leaveTypes.find((lt) => lt.id === values.leaveTypeId)
+      const sick = selectedType?.code === 'SICK'
+
+      // Para incapacidad/enfermedad el documento es obligatorio.
+      let incapacidadUrl: string | null = null
+      if (sick) {
+        if (!incapacidadFile) {
+          setServerErrors(['Debes adjuntar el documento de incapacidad (PDF o imagen).'])
+          setLoading(false)
+          return
+        }
+        const fd = new FormData()
+        fd.append('file', incapacidadFile)
+        fd.append('employeeId', employee.id)
+        const up = await uploadIncapacidad(fd)
+        if (!up.ok) {
+          setServerErrors([up.error || 'No se pudo subir la incapacidad.'])
+          setLoading(false)
+          return
+        }
+        incapacidadUrl = up.path
+      }
+
       const result = await submitVacationRequest({
         employeeId: employee.id,
         policyId: defaultPolicy.id,
+        leaveTypeId: values.leaveTypeId,
+        requestType: sick ? 'sick' : 'vacation',
         startDate: values.startDate,
         endDate: values.endDate,
         reason: values.reason ?? null,
+        incapacidadUrl,
+        incapacidadRef: null,
         fractionIndex: values.fractionIndex,
         fractionTotal: values.fractionTotal,
         shortNoticeAck: values.shortNoticeAck,
@@ -163,7 +193,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
       setSuccess(true)
       setTimeout(() => router.push('/vacaciones'), 1500)
     },
-    [employee.id, policy, router]
+    [employee.id, policy, router, leaveTypes, incapacidadFile]
   )
 
   if (success) {
@@ -282,6 +312,31 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
           )}
         </div>
 
+        {/* Incapacidad file (solo enfermedad) */}
+        {isSick && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              Documento de incapacidad <span className="text-red-400">*</span>
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,image/*"
+              onChange={(e) => setIncapacidadFile(e.target.files?.[0] ?? null)}
+              className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-white hover:file:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              Adjunta el certificado o constancia de incapacidad (PDF o imagen). Obligatorio.
+            </p>
+            {incapacidadFile && (
+              <p className="text-xs text-green-400 mt-1">Archivo seleccionado: {incapacidadFile.name}</p>
+            )}
+            <p className="text-xs text-indigo-300 mt-1">
+              Esta solicitud se registra como <strong>incapacidad / enfermedad</strong> (Art. 200 C.T.) y no descuenta de tus vacaciones.
+            </p>
+          </div>
+        )}
+
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -380,7 +435,7 @@ export function VacationRequestFormClient({ employee, balance, policy, leaveType
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            disabled={loading || remainingAfter < 0}
+            disabled={loading || (!isSick && remainingAfter < 0)}
             className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors"
           >
             {loading ? 'Enviando...' : 'Enviar solicitud'}

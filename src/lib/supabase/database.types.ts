@@ -130,6 +130,7 @@ export interface Database {
           terminated_at: string | null
           mes_vacaciones: string | null
           dias_pendientes: number
+          dias_enfermedad: number
           monthly_salary: number | null
           status: EmployeeStatus
           role: UserRole
@@ -157,6 +158,7 @@ export interface Database {
           terminated_at?: string | null
           mes_vacaciones?: string | null
           dias_pendientes?: number
+          dias_enfermedad?: number
           monthly_salary?: number | null
           status?: EmployeeStatus
           role?: UserRole
@@ -184,6 +186,7 @@ export interface Database {
           terminated_at?: string | null
           mes_vacaciones?: string | null
           dias_pendientes?: number
+          dias_enfermedad?: number
           monthly_salary?: number | null
           status?: EmployeeStatus
           role?: UserRole
@@ -385,6 +388,9 @@ export interface Database {
           decided_at: string | null
           decided_by: string | null
           decision_notes: string | null
+          request_type: string
+          incapacidad_url: string | null
+          incapacidad_ref: string | null
           created_at: string
           updated_at: string
         }
@@ -408,6 +414,9 @@ export interface Database {
           decided_at?: string | null
           decided_by?: string | null
           decision_notes?: string | null
+          request_type?: string
+          incapacidad_url?: string | null
+          incapacidad_ref?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -431,6 +440,9 @@ export interface Database {
           decided_at?: string | null
           decided_by?: string | null
           decision_notes?: string | null
+          request_type?: string
+          incapacidad_url?: string | null
+          incapacidad_ref?: string | null
           updated_at?: string
         }
         Relationships: [

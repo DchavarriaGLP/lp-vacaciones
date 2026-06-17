@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { decideApproval } from '@/modules/vacations/actions'
+import { decideApproval, getIncapacidadSignedUrl } from '@/modules/vacations/actions'
 import { cn } from '@/lib/utils'
 
 function StatusBadge({ status }: { status: string }) {
@@ -41,6 +41,8 @@ interface PendingStep {
     short_notice: boolean
     reason: string | null
     submitted_at: string | null
+    request_type: string | null
+    incapacidad_url: string | null
     employees: {
       full_name: string
       position: string | null
@@ -153,6 +155,41 @@ function DecisionModal({ stepId, requestId, employeeName, onClose, onDone }: Dec
   )
 }
 
+function VerIncapacidad({ path }: { path: string }) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function open() {
+    setLoading(true)
+    setError(null)
+    const res = await getIncapacidadSignedUrl(path)
+    setLoading(false)
+    if (!res.ok || !res.url) {
+      setError(res.error || 'No se pudo abrir')
+      return
+    }
+    window.open(res.url, '_blank', 'noopener,noreferrer')
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <button
+        type="button"
+        onClick={open}
+        disabled={loading}
+        className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 disabled:opacity-50"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+        {loading ? 'Abriendo...' : 'Ver incapacidad'}
+      </button>
+      {error && <span className="text-xs text-red-400">{error}</span>}
+    </span>
+  )
+}
+
 export function AprobacionesClient({ pendingSteps, allRequests, role }: Props) {
   const router = useRouter()
   const [activeModal, setActiveModal] = useState<{
@@ -210,6 +247,12 @@ export function AprobacionesClient({ pendingSteps, allRequests, role }: Props) {
                       Saldo actual: <strong className={Number(emp.dias_pendientes) > 60 ? 'text-red-400' : 'text-gray-300'}>{Number(emp.dias_pendientes).toFixed(1)} días</strong>
                       {req.reason && ` · "${req.reason}"`}
                     </p>
+                    {req.request_type === 'sick' && (
+                      <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                        <span className="text-xs bg-rose-900/60 text-rose-300 px-2 py-0.5 rounded-full">Incapacidad / Enfermedad</span>
+                        {req.incapacidad_url && <VerIncapacidad path={req.incapacidad_url} />}
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => setActiveModal({ stepId: step.id, requestId: req.id, employeeName: emp.full_name })}

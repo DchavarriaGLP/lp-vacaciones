@@ -35,12 +35,14 @@ function StatusDot({ status }: { status: string }) {
 interface Employee {
   id: string
   employee_code: string
+  cedula: string | null
   full_name: string
   position: string | null
   email: string
   username: string
   hire_date: string
   dias_pendientes: number
+  dias_enfermedad: number
   status: string
   role: string
   jefe_directo: string | null
@@ -176,6 +178,13 @@ function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps
             {msg && <p className={cn('text-xs mt-1', msg === 'Guardado' ? 'text-green-400' : 'text-red-400')}>{msg}</p>}
           </div>
           <div>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Días de enfermedad disponibles</p>
+            <p className="text-xl font-bold text-sky-400">
+              {Number(employee.dias_enfermedad ?? 0).toFixed(1)} días
+            </p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-600">Art. 200 C.T. (18 días/año)</p>
+          </div>
+          <div>
             <p className="text-xs text-gray-500 dark:text-gray-500">Rol</p>
             <RoleBadge role={employee.role} />
           </div>
@@ -203,6 +212,52 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
   function handleSaved(id: string, dias: number) {
     setEmployees((prev) => prev.map((e) => e.id === id ? { ...e, dias_pendientes: dias } : e))
     setSelectedEmployee((prev) => prev && prev.id === id ? { ...prev, dias_pendientes: dias } : prev)
+  }
+
+  function exportCSV() {
+    const esc = (val: unknown) => {
+      const str = val === null || val === undefined ? '' : String(val)
+      if (/[",\n;]/.test(str)) return '"' + str.replace(/"/g, '""') + '"'
+      return str
+    }
+    const statusLabels: Record<string, string> = {
+      active: 'Activo', inactive: 'Inactivo', on_vacation: 'En vacaciones',
+      on_leave: 'En licencia', terminated: 'Terminado',
+    }
+    const roleLabels: Record<string, string> = {
+      admin: 'Admin', manager: 'Gerente', employee: 'Empleado',
+    }
+    const headers = [
+      'Código', 'Nombre', 'Cédula', 'Cargo', 'Empresa', 'Proyecto',
+      'Fecha ingreso', 'Días vacaciones', 'Días enfermedad', 'Estado', 'Rol',
+    ]
+    const rows = employees.map((e) => [
+      e.employee_code,
+      e.full_name,
+      e.cedula ?? '',
+      e.position ?? '',
+      e.companies?.name ?? '',
+      e.projects?.name ?? '',
+      e.hire_date ?? '',
+      Number(e.dias_pendientes ?? 0).toFixed(1),
+      Number(e.dias_enfermedad ?? 0).toFixed(1),
+      statusLabels[e.status] ?? e.status,
+      roleLabels[e.role] ?? e.role,
+    ])
+    const csv = [headers, ...rows]
+      .map((row) => row.map(esc).join(','))
+      .join('\r\n')
+    // BOM para que Excel respete los acentos.
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const today = new Date().toISOString().slice(0, 10)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `empleados_${today}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const activeEmployees = useMemo(() =>
@@ -240,14 +295,27 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Empleados</h1>
-        <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">
-          {filteredActive.length} activos · {inactiveEmployees.length} inactivos
-          {overLimit > 0 && (
-            <span className="ml-2 text-red-400 font-medium">· {overLimit} con saldo &gt;60 días</span>
-          )}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Empleados</h1>
+          <p className="text-gray-500 dark:text-gray-600 dark:text-gray-400 text-sm mt-1">
+            {filteredActive.length} activos · {inactiveEmployees.length} inactivos
+            {overLimit > 0 && (
+              <span className="ml-2 text-red-400 font-medium">· {overLimit} con saldo &gt;60 días</span>
+            )}
+          </p>
+        </div>
+        {isAdmin && (
+          <button
+            onClick={exportCSV}
+            className="shrink-0 inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Exportar reporte (CSV)
+          </button>
+        )}
       </div>
 
       {/* Filters */}

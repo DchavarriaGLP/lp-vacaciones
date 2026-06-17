@@ -22,7 +22,7 @@ export default async function AprobacionesPage() {
       request_id,
       vacation_requests!inner(
         id, start_date, end_date, business_days, calendar_days,
-        status, reason, short_notice, submitted_at,
+        status, reason, short_notice, submitted_at, request_type, incapacidad_url,
         employees!inner(
           id, full_name, position, dias_pendientes,
           companies(name),
@@ -42,7 +42,7 @@ export default async function AprobacionesPage() {
     const { data } = await supabase
       .from('vacation_requests')
       .select(`
-        id, start_date, end_date, business_days, status, submitted_at, short_notice, reason,
+        id, start_date, end_date, business_days, status, submitted_at, short_notice, reason, request_type, incapacidad_url,
         employees(id, full_name, position, dias_pendientes, companies(name), projects(name)),
         leave_types(name_es),
         approval_steps(id, approver_id, decision, decided_at)

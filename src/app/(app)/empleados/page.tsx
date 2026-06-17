@@ -17,8 +17,8 @@ export default async function EmpleadosPage() {
   const { data: employees } = await supabase
     .from('employees')
     .select(`
-      id, employee_code, full_name, position, email, username,
-      hire_date, dias_pendientes, status, role, jefe_directo,
+      id, employee_code, cedula, full_name, position, email, username,
+      hire_date, dias_pendientes, dias_enfermedad, status, role, jefe_directo,
       companies(id, name),
       projects(id, name)
     `)

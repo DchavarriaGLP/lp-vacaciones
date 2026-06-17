@@ -17,6 +17,58 @@ import {
   diffCalendarDays,
   isShortNotice,
 } from "@/lib/domain/vacation-rules";
+import type { ValidationResult } from "@/lib/domain/vacation-rules";
+
+/**
+ * Sube un archivo de incapacidad al bucket privado 'incapacidades'.
+ * Devuelve la ruta almacenada (path) para guardarla en vacation_requests.incapacidad_url.
+ */
+export async function uploadIncapacidad(formData: FormData) {
+  const session = await getSession();
+  if (!session) return { ok: false as const, error: "No autenticado" };
+
+  const file = formData.get("file");
+  const employeeId = formData.get("employeeId");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false as const, error: "Archivo no válido" };
+  }
+  if (typeof employeeId !== "string" || !employeeId) {
+    return { ok: false as const, error: "Empleado no válido" };
+  }
+
+  const supabase = createAdminClient();
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = `${employeeId}/${Date.now()}_${safeName}`;
+
+  const { error } = await supabase.storage
+    .from("incapacidades")
+    .upload(path, file, {
+      contentType: file.type || "application/octet-stream",
+      upsert: false,
+    });
+
+  if (error) return { ok: false as const, error: error.message };
+
+  return { ok: true as const, path };
+}
+
+/**
+ * Genera una URL firmada temporal (1h) para descargar/ver una incapacidad.
+ */
+export async function getIncapacidadSignedUrl(path: string) {
+  const session = await getSession();
+  if (!session) return { ok: false as const, error: "No autenticado" };
+  if (!path) return { ok: false as const, error: "Ruta no válida" };
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.storage
+    .from("incapacidades")
+    .createSignedUrl(path, 3600);
+
+  if (error || !data) return { ok: false as const, error: error?.message ?? "No se pudo generar el enlace" };
+  return { ok: true as const, url: data.signedUrl };
+}
 
 export async function submitVacationRequest(formData: unknown) {
   const session = await getSession();
@@ -28,6 +80,7 @@ export async function submitVacationRequest(formData: unknown) {
     return { ok: false, error: parsed.error.flatten() };
   }
   const input = parsed.data;
+  const isSick = input.requestType === "sick";
 
   // Cargar política, balance y empleado
   const [{ data: policy }, { data: balance }, { data: employee }] =
@@ -42,45 +95,50 @@ export async function submitVacationRequest(formData: unknown) {
       supabase.from("employees").select("id, company_id, manager_id, user_id").eq("id", input.employeeId).single(),
     ]);
 
-  if (!policy || !balance || !employee) {
+  // Para enfermedad no se requiere balance de vacaciones.
+  if (!policy || !employee || (!isSick && !balance)) {
     return { ok: false, error: "Datos no encontrados" };
   }
 
   const start = new Date(input.startDate);
   const end = new Date(input.endDate);
 
-  const validation = validateVacationRequest({
-    startDate: start,
-    endDate: end,
-    fractionIndex: input.fractionIndex,
-    fractionTotal: input.fractionTotal,
-    shortNoticeAck: input.shortNoticeAck,
-    policy: {
-      id: policy.id,
-      companyId: policy.company_id ?? "",
-      name: policy.name,
-      isDefault: policy.is_default,
-      accrualDaysPerMonth: Number(policy.accrual_days_per_month),
-      maxAccumulatedPeriods: policy.max_accumulated_periods,
-      allowFraction: policy.allow_fraction,
-      maxFractions: policy.max_fractions,
-      advanceNoticeDays: policy.advance_notice_days,
-      paymentLeadDays: policy.payment_lead_days,
-      paymentCalcBasis: policy.payment_calc_basis,
-      approvalLevels: policy.approval_levels,
-    },
-    balance: {
-      id: balance.id,
-      employeeId: balance.employee_id,
-      periodYear: balance.period_year,
-      accruedDays: Number(balance.accrued_days),
-      usedDays: Number(balance.used_days),
-      availableDays: Number(balance.available_days),
-      accumulationAuthorizedAt: balance.accumulation_authorized_at,
-    },
-  });
+  // Las solicitudes de enfermedad NO se validan contra el saldo de vacaciones.
+  let validation: ValidationResult = { ok: true, errors: [], warnings: [] };
+  if (!isSick && balance) {
+    validation = validateVacationRequest({
+      startDate: start,
+      endDate: end,
+      fractionIndex: input.fractionIndex,
+      fractionTotal: input.fractionTotal,
+      shortNoticeAck: input.shortNoticeAck,
+      policy: {
+        id: policy.id,
+        companyId: policy.company_id ?? "",
+        name: policy.name,
+        isDefault: policy.is_default,
+        accrualDaysPerMonth: Number(policy.accrual_days_per_month),
+        maxAccumulatedPeriods: policy.max_accumulated_periods,
+        allowFraction: policy.allow_fraction,
+        maxFractions: policy.max_fractions,
+        advanceNoticeDays: policy.advance_notice_days,
+        paymentLeadDays: policy.payment_lead_days,
+        paymentCalcBasis: policy.payment_calc_basis,
+        approvalLevels: policy.approval_levels,
+      },
+      balance: {
+        id: balance.id,
+        employeeId: balance.employee_id,
+        periodYear: balance.period_year,
+        accruedDays: Number(balance.accrued_days),
+        usedDays: Number(balance.used_days),
+        availableDays: Number(balance.available_days),
+        accumulationAuthorizedAt: balance.accumulation_authorized_at,
+      },
+    });
 
-  if (!validation.ok) return { ok: false, error: validation.errors };
+    if (!validation.ok) return { ok: false, error: validation.errors };
+  }
 
   // Insertar request
   const { data: request, error: insertErr } = await supabase
@@ -89,11 +147,15 @@ export async function submitVacationRequest(formData: unknown) {
       company_id: employee.company_id,
       employee_id: input.employeeId,
       policy_id: input.policyId,
+      leave_type_id: input.leaveTypeId ?? null,
+      request_type: input.requestType,
       start_date: input.startDate,
       end_date: input.endDate,
       business_days: diffBusinessDays(start, end),
       calendar_days: diffCalendarDays(start, end),
       reason: input.reason,
+      incapacidad_url: input.incapacidadUrl ?? null,
+      incapacidad_ref: input.incapacidadRef ?? null,
       status: "pending",
       fraction_index: input.fractionIndex,
       fraction_total: input.fractionTotal,
@@ -128,8 +190,8 @@ export async function submitVacationRequest(formData: unknown) {
         company_id: employee.company_id,
         recipient_id: manager.user_id,
         type: "request_submitted",
-        title: "Nueva solicitud de vacaciones",
-        body: `Tienes una solicitud pendiente de aprobación para el período ${input.startDate} a ${input.endDate}.`,
+        title: isSick ? "Nueva solicitud de incapacidad" : "Nueva solicitud de vacaciones",
+        body: `Tienes una solicitud${isSick ? " de incapacidad" : ""} pendiente de aprobación para el período ${input.startDate} a ${input.endDate}.`,
         link_url: `/aprobaciones/${request.id}`,
       });
     }
@@ -200,33 +262,53 @@ export async function decideApproval(formData: unknown) {
       })
       .eq("id", requestId);
 
-    // Si fue aprobado: actualizar balance + crear payroll_event
+    // Si fue aprobado: descontar saldo según tipo de solicitud
     if (newStatus === "approved" && before) {
-      await supabase.rpc("increment_used_days", {
-        p_employee_id: before.employee_id,
-        p_period_year: new Date(before.start_date).getUTCFullYear(),
-        p_days: before.business_days,
-      });
+      const isSick = before.request_type === "sick";
 
-      const { data: policy } = await supabase
-        .from("vacation_policies")
-        .select("payment_lead_days, payment_calc_basis")
-        .eq("id", before.policy_id)
-        .single();
+      if (isSick) {
+        // Enfermedad: NO toca vacaciones. Descuenta de employees.dias_enfermedad.
+        const { data: emp } = await supabase
+          .from("employees")
+          .select("dias_enfermedad")
+          .eq("id", before.employee_id)
+          .single();
 
-      if (policy) {
-        const payDate = new Date(before.start_date);
-        payDate.setUTCDate(payDate.getUTCDate() - policy.payment_lead_days);
+        const current = Number(emp?.dias_enfermedad ?? 0);
+        const next = current - Number(before.business_days);
 
-        await supabase.from("payroll_events").insert({
-          company_id: before.company_id,
-          employee_id: before.employee_id,
-          source_type: "vacation_request",
-          source_id: before.id,
-          event_type: "vacation_payment",
-          scheduled_at: payDate.toISOString().slice(0, 10),
-          calc_basis: policy.payment_calc_basis,
+        await supabase
+          .from("employees")
+          .update({ dias_enfermedad: next })
+          .eq("id", before.employee_id);
+      } else {
+        // Vacaciones: actualizar balance + crear payroll_event (comportamiento existente).
+        await supabase.rpc("increment_used_days", {
+          p_employee_id: before.employee_id,
+          p_period_year: new Date(before.start_date).getUTCFullYear(),
+          p_days: before.business_days,
         });
+
+        const { data: policy } = await supabase
+          .from("vacation_policies")
+          .select("payment_lead_days, payment_calc_basis")
+          .eq("id", before.policy_id)
+          .single();
+
+        if (policy) {
+          const payDate = new Date(before.start_date);
+          payDate.setUTCDate(payDate.getUTCDate() - policy.payment_lead_days);
+
+          await supabase.from("payroll_events").insert({
+            company_id: before.company_id,
+            employee_id: before.employee_id,
+            source_type: "vacation_request",
+            source_id: before.id,
+            event_type: "vacation_payment",
+            scheduled_at: payDate.toISOString().slice(0, 10),
+            calc_basis: policy.payment_calc_basis,
+          });
+        }
       }
     }
 
