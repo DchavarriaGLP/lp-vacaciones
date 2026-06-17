@@ -18,7 +18,7 @@ export default async function EmpleadosPage() {
     .from('employees')
     .select(`
       id, employee_code, cedula, full_name, position, email, username,
-      hire_date, dias_pendientes, dias_enfermedad, status, role, jefe_directo,
+      hire_date, dias_pendientes, dias_base, fecha_base, dias_enfermedad, status, role, jefe_directo,
       companies(id, name),
       projects(id, name)
     `)

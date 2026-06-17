@@ -289,6 +289,27 @@ export async function decideApproval(formData: unknown) {
           p_days: before.business_days,
         });
 
+        // Descontar los días aprobados del saldo base para que el saldo
+        // dinámico (saldoVacaciones) refleje el consumo. Best-effort.
+        const { data: empBal } = await supabase
+          .from("employees")
+          .select("dias_base, dias_pendientes")
+          .eq("id", before.employee_id)
+          .single();
+
+        if (empBal) {
+          const used = Number(before.business_days);
+          const updates: { dias_base?: number; dias_pendientes?: number } = {};
+          if (empBal.dias_base != null) {
+            updates.dias_base = Number(empBal.dias_base) - used;
+          }
+          updates.dias_pendientes = Number(empBal.dias_pendientes ?? 0) - used;
+          await supabase
+            .from("employees")
+            .update(updates)
+            .eq("id", before.employee_id);
+        }
+
         const { data: policy } = await supabase
           .from("vacation_policies")
           .select("payment_lead_days, payment_calc_basis")

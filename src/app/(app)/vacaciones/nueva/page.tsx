@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth/session'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { VacationRequestFormClient } from './VacationRequestFormClient'
+import { saldoVacaciones } from '@/lib/domain/vacation-rules'
 
 export default async function NuevaVacacionPage() {
   const session = await getSession()
@@ -10,7 +11,7 @@ export default async function NuevaVacacionPage() {
 
   const { data: employee } = await supabase
     .from('employees')
-    .select('id, full_name, dias_pendientes, hire_date, company_id')
+    .select('id, full_name, dias_pendientes, dias_base, fecha_base, hire_date, company_id')
     .eq('user_id', session.id)
     .single()
 
@@ -48,7 +49,8 @@ export default async function NuevaVacacionPage() {
     .eq('active', true)
     .order('name_es')
 
-  const availDays = balance?.available_days ?? employee.dias_pendientes ?? 0
+  const availDays = balance?.available_days
+    ?? saldoVacaciones(employee.dias_base, employee.fecha_base, Number(employee.dias_pendientes ?? 0))
 
   return (
     <VacationRequestFormClient

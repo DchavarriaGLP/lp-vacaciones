@@ -109,3 +109,28 @@ export function paymentScheduleDate(
   d.setUTCDate(d.getUTCDate() - policy.paymentLeadDays);
   return d;
 }
+
+/**
+ * Saldo de vacaciones dinámico (no se resetea, crece con el tiempo).
+ * Ley panameña Art. 54: 30 días por cada 11 meses = 30/365 días por día calendario.
+ *
+ *   saldoActual = dias_base + díasTranscurridos(desde fecha_base) * (30/365)
+ *
+ * Si dias_base o fecha_base son null, se usa dias_pendientes tal cual.
+ * Fechas en formato 'YYYY-MM-DD'. Se usa UTC para evitar desfases de zona horaria.
+ */
+export function saldoVacaciones(
+  diasBase: number | null,
+  fechaBase: string | null,
+  diasPendientes: number
+): number {
+  if (diasBase == null || fechaBase == null) return diasPendientes;
+
+  const base = new Date(`${fechaBase}T00:00:00Z`).getTime();
+  if (Number.isNaN(base)) return diasPendientes;
+
+  const now = Date.now();
+  const diasTranscurridos = Math.max(0, Math.floor((now - base) / MS_PER_DAY));
+  const saldo = diasBase + diasTranscurridos * (30 / 365);
+  return Math.round(saldo * 10) / 10;
+}

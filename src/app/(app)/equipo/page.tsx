@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth/session'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import { saldoVacaciones } from '@/lib/domain/vacation-rules'
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -24,7 +25,7 @@ export default async function EquipoPage() {
   const { data: directReports } = employee
     ? await supabase
         .from('employees')
-        .select('id, full_name, position, hire_date, dias_pendientes, status, email')
+        .select('id, full_name, position, hire_date, dias_pendientes, dias_base, fecha_base, status, email')
         .eq('manager_id', employee.id)
         .eq('status', 'active')
         .order('full_name')
@@ -105,9 +106,14 @@ export default async function EquipoPage() {
                     <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{emp.position ?? '—'}</td>
                     <td className="px-5 py-3.5 text-gray-500 dark:text-gray-600 dark:text-gray-400 text-xs">{formatDate(emp.hire_date)}</td>
                     <td className="px-5 py-3.5 text-right">
-                      <span className={Number(emp.dias_pendientes) > 60 ? 'text-red-400 font-bold' : Number(emp.dias_pendientes) > 30 ? 'text-yellow-400' : 'text-green-400'}>
-                        {Number(emp.dias_pendientes).toFixed(1)}
-                      </span>
+                      {(() => {
+                        const saldo = saldoVacaciones(emp.dias_base, emp.fecha_base, Number(emp.dias_pendientes))
+                        return (
+                          <span className={saldo > 60 ? 'text-red-400 font-bold' : saldo > 30 ? 'text-yellow-400' : 'text-green-400'}>
+                            {saldo.toFixed(1)}
+                          </span>
+                        )
+                      })()}
                     </td>
                   </tr>
                 ))}

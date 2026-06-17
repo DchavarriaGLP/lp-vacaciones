@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getSession } from '@/lib/auth/session'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { formatDate } from '@/lib/utils'
+import { saldoVacaciones } from '@/lib/domain/vacation-rules'
 
 function StatCard({
   label,
@@ -110,7 +111,12 @@ export default async function DashboardPage() {
     teamOnVacation = vacCount ?? 0
   }
 
-  const availDays = balance?.available_days ?? employee?.dias_pendientes ?? 0
+  const availDays = balance?.available_days
+    ?? saldoVacaciones(
+      (employee?.dias_base ?? null) as number | null,
+      (employee?.fecha_base ?? null) as string | null,
+      Number(employee?.dias_pendientes ?? 0)
+    )
   const isOverLimit = Number(availDays) > 60
   const accentDays = Number(availDays) > 60 ? 'red' : Number(availDays) > 30 ? 'yellow' : 'green'
 

@@ -130,6 +130,8 @@ export interface Database {
           terminated_at: string | null
           mes_vacaciones: string | null
           dias_pendientes: number
+          dias_base: number | null
+          fecha_base: string | null
           dias_enfermedad: number
           monthly_salary: number | null
           status: EmployeeStatus
@@ -158,6 +160,8 @@ export interface Database {
           terminated_at?: string | null
           mes_vacaciones?: string | null
           dias_pendientes?: number
+          dias_base?: number | null
+          fecha_base?: string | null
           dias_enfermedad?: number
           monthly_salary?: number | null
           status?: EmployeeStatus
@@ -186,6 +190,8 @@ export interface Database {
           terminated_at?: string | null
           mes_vacaciones?: string | null
           dias_pendientes?: number
+          dias_base?: number | null
+          fecha_base?: string | null
           dias_enfermedad?: number
           monthly_salary?: number | null
           status?: EmployeeStatus

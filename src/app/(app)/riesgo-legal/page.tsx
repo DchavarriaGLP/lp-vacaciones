@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth/session'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import { saldoVacaciones } from '@/lib/domain/vacation-rules'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,22 +32,26 @@ export default async function RiesgoLegalPage() {
   const { data: appUser } = await supabase.from('app_users').select('role').eq('id', session.id).single()
   if (appUser?.role !== 'admin') redirect('/dashboard')
 
-  // Employees with > 60 days balance (High risk: MITRADEL)
-  const { data: highRisk } = await supabase
+  // Cargar empleados activos y calcular el saldo dinámico (no se resetea, crece con el tiempo).
+  const { data: activeEmployees } = await supabase
     .from('employees')
-    .select('id, full_name, position, dias_pendientes, hire_date, companies(name), projects(name)')
-    .gt('dias_pendientes', 60)
+    .select('id, full_name, position, dias_pendientes, dias_base, fecha_base, hire_date, companies(name), projects(name)')
     .in('status', ['active', 'on_vacation', 'on_leave'])
-    .order('dias_pendientes', { ascending: false })
 
-  // Employees with 45-60 days (Medium risk: approaching limit)
-  const { data: mediumRisk } = await supabase
-    .from('employees')
-    .select('id, full_name, position, dias_pendientes, hire_date, companies(name), projects(name)')
-    .gte('dias_pendientes', 45)
-    .lte('dias_pendientes', 60)
-    .in('status', ['active', 'on_vacation', 'on_leave'])
-    .order('dias_pendientes', { ascending: false })
+  const withSaldo = (activeEmployees ?? []).map((emp) => ({
+    ...emp,
+    saldo: saldoVacaciones(emp.dias_base, emp.fecha_base, Number(emp.dias_pendientes)),
+  }))
+
+  // High risk: saldo > 60 días (MITRADEL)
+  const highRisk = withSaldo
+    .filter((e) => e.saldo > 60)
+    .sort((a, b) => b.saldo - a.saldo)
+
+  // Medium risk: 45-60 días (approaching limit)
+  const mediumRisk = withSaldo
+    .filter((e) => e.saldo >= 45 && e.saldo <= 60)
+    .sort((a, b) => b.saldo - a.saldo)
 
   // Pending requests older than 10 days (approval risk)
   const tenDaysAgo = new Date()
@@ -120,7 +125,7 @@ export default async function RiesgoLegalPage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {highRisk?.map((emp) => {
-                  const dias = Number(emp.dias_pendientes)
+                  const dias = emp.saldo
                   const excess = dias - 60
                   return (
                     <tr key={emp.id} className="hover:bg-red-950/20">
@@ -170,7 +175,7 @@ export default async function RiesgoLegalPage() {
                       {(emp as { companies?: { name: string } | null }).companies?.name ?? '—'}
                     </td>
                     <td className="px-5 py-3.5 text-right font-bold font-mono text-yellow-400">
-                      {Number(emp.dias_pendientes).toFixed(1)}
+                      {emp.saldo.toFixed(1)}
                     </td>
                   </tr>
                 ))}

@@ -48,9 +48,16 @@ export async function updateEmployeeDays(
 
   if (!before) return { error: 'Empleado no encontrado' }
 
+  // Al fijar manualmente el saldo, se reinicia la base de acumulación a hoy
+  // para que el saldo dinámico (saldoVacaciones) parta del valor ingresado.
+  const today = new Date().toISOString().slice(0, 10)
   const { error } = await supabase
     .from('employees')
-    .update({ dias_pendientes: parsed.data.dias })
+    .update({
+      dias_pendientes: parsed.data.dias,
+      dias_base: parsed.data.dias,
+      fecha_base: today,
+    })
     .eq('id', parsed.data.employeeId)
 
   if (error) return { error: error.message }

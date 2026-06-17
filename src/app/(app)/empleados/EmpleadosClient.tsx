@@ -3,6 +3,7 @@
 import { useState, useMemo, useTransition } from 'react'
 import { updateEmployeeDays } from './actions'
 import { cn } from '@/lib/utils'
+import { saldoVacaciones } from '@/lib/domain/vacation-rules'
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -42,6 +43,8 @@ interface Employee {
   username: string
   hire_date: string
   dias_pendientes: number
+  dias_base: number | null
+  fecha_base: string | null
   dias_enfermedad: number
   status: string
   role: string
@@ -76,7 +79,7 @@ interface ProfileModalProps {
 }
 
 function ProfileModal({ employee, onClose, canEdit, onSaved }: ProfileModalProps) {
-  const dias = Number(employee.dias_pendientes)
+  const dias = saldoVacaciones(employee.dias_base, employee.fecha_base, Number(employee.dias_pendientes))
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(dias.toFixed(1))
   const [isPending, startTransition] = useTransition()
@@ -210,8 +213,9 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
 
   function handleSaved(id: string, dias: number) {
-    setEmployees((prev) => prev.map((e) => e.id === id ? { ...e, dias_pendientes: dias } : e))
-    setSelectedEmployee((prev) => prev && prev.id === id ? { ...prev, dias_pendientes: dias } : prev)
+    const today = new Date().toISOString().slice(0, 10)
+    setEmployees((prev) => prev.map((e) => e.id === id ? { ...e, dias_pendientes: dias, dias_base: dias, fecha_base: today } : e))
+    setSelectedEmployee((prev) => prev && prev.id === id ? { ...prev, dias_pendientes: dias, dias_base: dias, fecha_base: today } : prev)
   }
 
   function exportCSV() {
@@ -239,7 +243,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
       e.companies?.name ?? '',
       e.projects?.name ?? '',
       e.hire_date ?? '',
-      Number(e.dias_pendientes ?? 0).toFixed(1),
+      saldoVacaciones(e.dias_base, e.fecha_base, Number(e.dias_pendientes ?? 0)).toFixed(1),
       Number(e.dias_enfermedad ?? 0).toFixed(1),
       statusLabels[e.status] ?? e.status,
       roleLabels[e.role] ?? e.role,
@@ -290,7 +294,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
     ? projects.filter((p) => p.company_id === filterCompany)
     : projects
 
-  const overLimit = filteredActive.filter((e) => Number(e.dias_pendientes) > 60).length
+  const overLimit = filteredActive.filter((e) => saldoVacaciones(e.dias_base, e.fecha_base, Number(e.dias_pendientes)) > 60).length
 
   return (
     <div className="space-y-6">
@@ -376,7 +380,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
                 </tr>
               ) : (
                 filteredActive.map((emp) => {
-                  const dias = Number(emp.dias_pendientes)
+                  const dias = saldoVacaciones(emp.dias_base, emp.fecha_base, Number(emp.dias_pendientes))
                   const overMax = dias > 60
                   return (
                     <tr
@@ -453,7 +457,7 @@ export function EmpleadosClient({ employees: initialEmployees, companies, projec
                       <td className="px-4 py-3 text-gray-300">{emp.full_name}</td>
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-500 text-xs">{emp.position ?? '—'}</td>
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-500 text-xs">{emp.companies?.name ?? '—'}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-500 dark:text-gray-600 dark:text-gray-400">{Number(emp.dias_pendientes).toFixed(1)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-500 dark:text-gray-600 dark:text-gray-400">{saldoVacaciones(emp.dias_base, emp.fecha_base, Number(emp.dias_pendientes)).toFixed(1)}</td>
                       <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-600">Inactivo</td>
                     </tr>
                   ))}
